@@ -1,10 +1,13 @@
-import entity.Epic;
-import entity.Status;
-import entity.Subtask;
-import entity.Task;
+package mainPackage;
+
+import mainPackage.entity.Epic;
+import mainPackage.entity.Status;
+import mainPackage.entity.Subtask;
+import mainPackage.entity.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 
 public class TaskManager {
 
@@ -14,7 +17,7 @@ public class TaskManager {
     private HashMap<Long, Subtask> subtaskHashMap;
     private HashMap<Long, Epic> epicHashMap;
 
-    public static TaskManager taskManager; // чтобы содержался только один объект
+    private static TaskManager taskManager; // чтобы содержался только один объект
 
     public static TaskManager getInstance() { // вызвать один раз в мейне для создания экземпляра
         if (taskManager == null) {
@@ -30,7 +33,7 @@ public class TaskManager {
 
     }
 
-    public long generateNewId() {
+    private long generateNewId() {
         return taskIdCounter++;
     }
 
@@ -51,10 +54,15 @@ public class TaskManager {
     }
 
     public void clearAllSubtasks() {
+        for (Epic epic : epicHashMap.values()) {
+            epic.removeSubtasks();
+            epic.setStatus(Status.NEW);
+        }
         subtaskHashMap.clear();
     }
 
     public void clearAllEpics() {
+        subtaskHashMap.clear();
         epicHashMap.clear();
     }
 
@@ -63,11 +71,23 @@ public class TaskManager {
     }
 
     public Subtask getSubtaskById(long id) {
-        return subtaskHashMap.get(id);
+        Subtask subtaskById = null;
+        for (Subtask subtask : subtaskHashMap.values()){
+            if (subtask.getId() == id){
+                subtaskById = subtask;
+            }
+        }
+        return subtaskById;
     }
 
-    public Epic getEpicById(long id) {
-        return epicHashMap.get(id);
+    public Epic getEpicBySubtaskId(long id) {
+        Epic epicById = null;
+        for (Epic epic : epicHashMap.values()) {
+            if (epic.getId() == id){
+                epicById = epic;
+            }
+        }
+        return epicById;
     }
 
     public void putNewTask(Task task) {
@@ -78,6 +98,8 @@ public class TaskManager {
     public void putNewSubtask(Subtask subtask) {
         subtask.setId(generateNewId());
         subtaskHashMap.put(subtask.getId(), subtask);
+        Epic epic = taskManager.getEpicBySubtaskId(subtask.getEpicId());
+        epic.addSubtaskId(subtask.getId());
     }
 
     public void putNewEpic(Epic epic) {
@@ -91,6 +113,10 @@ public class TaskManager {
 
     public void updateSubtask(Subtask subtask) {
         subtaskHashMap.put(subtask.getId(), subtask);
+        Epic epic = taskManager.getEpicBySubtaskId(subtask.getEpicId());
+        taskManager.updateEpicStatus(epic);
+
+
     }
 
     public void updateEpic(Epic epic) {
@@ -105,7 +131,7 @@ public class TaskManager {
         subtaskHashMap.remove(id);
     }
 
-    public void deleteEpicById(long id) {
+    public void deleteEpicById(long id) { // можно рациональнее?
         epicHashMap.remove(id);
     }
 
@@ -117,7 +143,7 @@ public class TaskManager {
         return subtasksById;
     }
 
-    public void updateEpicStatus(Epic epic) {
+    private void updateEpicStatus(Epic epic) { // метод внутреннего пользования
         if (epic.getSubtasksId().isEmpty()) {
             epic.setStatus(Status.NEW);
         } else {
@@ -137,7 +163,9 @@ public class TaskManager {
                 epic.setStatus(Status.NEW);
             } else if (counterDone == epic.getSubtasksId().size()) {
                 epic.setStatus(Status.DONE);
-            } else epic.setStatus(Status.IN_PROGRESS);
+            } else {
+                epic.setStatus(Status.IN_PROGRESS);
+            }
         }
     }
 }

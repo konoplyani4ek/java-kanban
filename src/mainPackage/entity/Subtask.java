@@ -1,4 +1,4 @@
-package entity;
+package mainPackage.entity;
 
 public class Subtask extends Task {
 
@@ -12,6 +12,10 @@ public class Subtask extends Task {
     public Subtask(String name, String description, long id, Status status, long epicId) { // для апдейта
         super(name, description, id, status);
         this.epicId = epicId;
+    }
+
+    public long getEpicId() {
+        return epicId;
     }
 
     @Override
