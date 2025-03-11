@@ -1,9 +1,9 @@
-package mainPackage;
+package javaKanban;
 
-import mainPackage.entity.Epic;
-import mainPackage.entity.Status;
-import mainPackage.entity.Subtask;
-import mainPackage.entity.Task;
+import javaKanban.entity.Epic;
+import javaKanban.entity.Status;
+import javaKanban.entity.Subtask;
+import javaKanban.entity.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,10 +56,15 @@ public class TaskManager {
     public void clearAllSubtasks() {
         for (Epic epic : epicHashMap.values()) {
             epic.removeSubtasks();
-            epic.setStatus(Status.NEW);
+            epic.setStatus(Status.NEW); // не понимаю, что именно тут должно быть?
         }
         subtaskHashMap.clear();
     }
+
+//    заменить метод на такой? см. ст 59
+//    public void setEpicStatusNew(Epic epic){
+//        epic.setStatus(Status.NEW);
+//    }
 
     public void clearAllEpics() {
         subtaskHashMap.clear();
@@ -71,19 +76,14 @@ public class TaskManager {
     }
 
     public Subtask getSubtaskById(long id) {
-        Subtask subtaskById = null;
-        for (Subtask subtask : subtaskHashMap.values()){
-            if (subtask.getId() == id){
-                subtaskById = subtask;
-            }
-        }
-        return subtaskById;
+        return subtaskHashMap.get(id);
     }
 
-    public Epic getEpicBySubtaskId(long id) {
+    public Epic getEpicBySubtaskId(long id) { // этот метод сущестует для получения эпика по айди эпика, указанному в сабтаске.
+        // метод getEpicById возвращает эпик по айди эпика. или я что-то не понял?
         Epic epicById = null;
         for (Epic epic : epicHashMap.values()) {
-            if (epic.getId() == id){
+            if (epic.getId() == id) {
                 epicById = epic;
             }
         }
@@ -96,10 +96,15 @@ public class TaskManager {
     }
 
     public void putNewSubtask(Subtask subtask) {
-        subtask.setId(generateNewId());
-        subtaskHashMap.put(subtask.getId(), subtask);
-        Epic epic = taskManager.getEpicBySubtaskId(subtask.getEpicId());
-        epic.addSubtaskId(subtask.getId());
+        try {
+            subtask.setId(generateNewId());
+            subtaskHashMap.put(subtask.getId(), subtask);
+            Epic epic = getEpicBySubtaskId(subtask.getEpicId());
+            epic.addSubtaskId(subtask.getId());
+            updateEpicStatus(epic);
+        } catch (NullPointerException e){
+            System.out.println("Эпика с таким номером не существует");
+        }
     }
 
     public void putNewEpic(Epic epic) {
@@ -113,10 +118,8 @@ public class TaskManager {
 
     public void updateSubtask(Subtask subtask) {
         subtaskHashMap.put(subtask.getId(), subtask);
-        Epic epic = taskManager.getEpicBySubtaskId(subtask.getEpicId());
-        taskManager.updateEpicStatus(epic);
-
-
+        Epic epic = getEpicBySubtaskId(subtask.getEpicId());
+        updateEpicStatus(epic); // я не совсем понял, почему именно так работает
     }
 
     public void updateEpic(Epic epic) {
@@ -129,9 +132,15 @@ public class TaskManager {
 
     public void deleteSubtaskById(long id) {
         subtaskHashMap.remove(id);
+        Epic epicToUpdate = getEpicBySubtaskId(id);
+        updateEpicStatus(epicToUpdate);
     }
 
-    public void deleteEpicById(long id) { // можно рациональнее?
+    public void deleteEpicById(long id) {
+        ArrayList<Long> subtasksToDelete = epicHashMap.get(id).getSubtasksId();
+        for (Long subtaskId : subtasksToDelete) {
+            subtaskHashMap.remove(subtaskId);
+        }
         epicHashMap.remove(id);
     }
 

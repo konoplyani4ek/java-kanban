@@ -1,9 +1,9 @@
-package mainPackage;
+package javaKanban;
 
-import mainPackage.entity.Epic;
-import mainPackage.entity.Status;
-import mainPackage.entity.Subtask;
-import mainPackage.entity.Task;
+import javaKanban.entity.Epic;
+import javaKanban.entity.Status;
+import javaKanban.entity.Subtask;
+import javaKanban.entity.Task;
 
 public class Main {
 
@@ -24,8 +24,8 @@ public class Main {
         taskManager.putNewEpic(epic);
         System.out.println(taskManager.getAllEpics());
         System.out.println("созданы 2 подзадачи.");
-        Subtask subtask1 = new Subtask("подзадача1", " Тема подзадачи 1", 3);
-        Subtask subtask2 = new Subtask("подзадача2", " Тема подзадачи 2", 3);
+        Subtask subtask1 = new Subtask("подзадача1", " Тема подзадачи 1", epic.getId());
+        Subtask subtask2 = new Subtask("подзадача2", " Тема подзадачи 2", epic.getId());
 
         taskManager.putNewSubtask(subtask1);
         taskManager.putNewSubtask(subtask2);
@@ -66,5 +66,6 @@ public class Main {
         taskManager.deleteEpicById(3);
         System.out.println("стало  " + taskManager.getAllEpics());
 
+        taskManager.putNewSubtask(new Subtask("подзадача 3", "тема 3", 9));
     }
 }

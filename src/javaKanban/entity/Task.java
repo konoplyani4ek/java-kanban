@@ -1,4 +1,4 @@
-package mainPackage.entity;
+package javaKanban.entity;
 
 import java.util.Objects;
 

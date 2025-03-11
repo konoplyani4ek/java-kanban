@@ -1,4 +1,4 @@
-package mainPackage.entity;
+package javaKanban.entity;
 
 public class Subtask extends Task {
 
