@@ -6,7 +6,7 @@ public class Task {
 
     private String name;
     private String description;
-    private long id;
+    private Long id;
     private Status status;
 
     @Override
@@ -14,7 +14,7 @@ public class Task {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Task task = (Task) object;
-        return id == task.id;
+        return Objects.equals(id, task.id);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class Task {
         this.status = Status.NEW;
     }
 
-    public Task(String name, String description, long id, Status status){ // мб нужен для тестов  метода обновлния
+    public Task(String name, String description, long id, Status status){
         this.name = name;
         this.description = description;
         this.status = status;
@@ -53,11 +53,10 @@ public class Task {
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" +
+        return getClass().getName() + ": " +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
-                ", status=" + status +
-                '}';
+                ", status=" + status;
     }
 }

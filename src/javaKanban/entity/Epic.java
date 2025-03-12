@@ -26,7 +26,6 @@ public class Epic extends Task {
     @Override
     public String toString() {
         return super.toString() +
-                " subtasksId=" + subtasksId +
-                '}';
+                " subtasksId=" + subtasksId;
     }
 }

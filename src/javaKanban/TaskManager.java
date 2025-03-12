@@ -56,15 +56,10 @@ public class TaskManager {
     public void clearAllSubtasks() {
         for (Epic epic : epicHashMap.values()) {
             epic.removeSubtasks();
-            epic.setStatus(Status.NEW); // не понимаю, что именно тут должно быть?
+            updateEpicStatus(epic);
         }
         subtaskHashMap.clear();
     }
-
-//    заменить метод на такой? см. ст 59
-//    public void setEpicStatusNew(Epic epic){
-//        epic.setStatus(Status.NEW);
-//    }
 
     public void clearAllEpics() {
         subtaskHashMap.clear();
@@ -79,15 +74,8 @@ public class TaskManager {
         return subtaskHashMap.get(id);
     }
 
-    public Epic getEpicBySubtaskId(long id) { // этот метод сущестует для получения эпика по айди эпика, указанному в сабтаске.
-        // метод getEpicById возвращает эпик по айди эпика. или я что-то не понял?
-        Epic epicById = null;
-        for (Epic epic : epicHashMap.values()) {
-            if (epic.getId() == id) {
-                epicById = epic;
-            }
-        }
-        return epicById;
+    public Epic getEpicById(long id) {
+        return epicHashMap.get(id);
     }
 
     public void putNewTask(Task task) {
@@ -96,14 +84,14 @@ public class TaskManager {
     }
 
     public void putNewSubtask(Subtask subtask) {
-        try {
+        Epic epic = getEpicById(subtask.getEpicId());
+        if (epic == null) {
+            System.out.println("\nЭпика с  номером " + subtask.getEpicId()  + " не существует");
+        } else {
             subtask.setId(generateNewId());
             subtaskHashMap.put(subtask.getId(), subtask);
-            Epic epic = getEpicBySubtaskId(subtask.getEpicId());
             epic.addSubtaskId(subtask.getId());
             updateEpicStatus(epic);
-        } catch (NullPointerException e){
-            System.out.println("Эпика с таким номером не существует");
         }
     }
 
@@ -118,8 +106,8 @@ public class TaskManager {
 
     public void updateSubtask(Subtask subtask) {
         subtaskHashMap.put(subtask.getId(), subtask);
-        Epic epic = getEpicBySubtaskId(subtask.getEpicId());
-        updateEpicStatus(epic); // я не совсем понял, почему именно так работает
+        Epic epic = getEpicById(subtask.getEpicId());
+        updateEpicStatus(epic);
     }
 
     public void updateEpic(Epic epic) {
@@ -131,9 +119,12 @@ public class TaskManager {
     }
 
     public void deleteSubtaskById(long id) {
+        Subtask subtaskToDelete = subtaskHashMap.get(id);
         subtaskHashMap.remove(id);
-        Epic epicToUpdate = getEpicBySubtaskId(id);
+        Epic epicToUpdate = getEpicById(subtaskToDelete.getEpicId());
+        epicToUpdate.getSubtasksId().remove(id);
         updateEpicStatus(epicToUpdate);
+
     }
 
     public void deleteEpicById(long id) {

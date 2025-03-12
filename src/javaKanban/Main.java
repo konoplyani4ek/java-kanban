@@ -61,11 +61,20 @@ public class Main {
         taskManager.deleteTaskById(1);
         System.out.println("стало " + taskManager.getAllTasks());
 
+        taskManager.putNewSubtask(new Subtask("подзадача 3", "тема 3", epic.getId()));
+        System.out.println("\n добавил сабтаск id=7 \n" + taskManager.getAllSubtasks());
+        System.out.println("\n статус эпика тоже изменился \n " + taskManager.getAllEpics());
+        taskManager.deleteSubtaskById(7);
+        System.out.println("\n удалил его \n " + taskManager.getAllSubtasks());
+
+
         System.out.println("\n удалить эпик");
         System.out.println("было " + taskManager.getAllEpics());
         taskManager.deleteEpicById(3);
         System.out.println("стало  " + taskManager.getAllEpics());
 
         taskManager.putNewSubtask(new Subtask("подзадача 3", "тема 3", 9));
+
+
     }
 }
