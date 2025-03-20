@@ -9,6 +9,8 @@ public class Task {
     private Long id;
     private Status status;
 
+
+
     @Override
     public boolean equals(Object object) { // в наследниках такой же
         if (this == object) return true;
@@ -38,6 +40,10 @@ public class Task {
         this.status = status;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
@@ -47,8 +53,8 @@ public class Task {
     public Task(String name, String description, long id, Status status){
         this.name = name;
         this.description = description;
-        this.status = status;
         this.id = id;
+        this.status = status;
     }
 
     @Override
