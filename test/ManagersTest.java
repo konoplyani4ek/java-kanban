@@ -1,7 +1,6 @@
-import javaKanban.HistoryManager;
-import javaKanban.InMemoryHistoryManager;
-import javaKanban.Managers;
-import javaKanban.TaskManager;
+import javaKanban.manager.history.HistoryManager;
+import javaKanban.manager.Managers;
+import javaKanban.manager.task.TaskManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

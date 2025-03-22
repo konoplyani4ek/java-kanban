@@ -1,11 +1,11 @@
-package javaKanban;
+package javaKanban.manager.history;
 
 import javaKanban.entity.Task;
 
 import java.util.ArrayList;
 
-public class InMemoryHistoryManager implements HistoryManager { // где почитать про все эти менеджеры и зачем их делать?
-    private ArrayList<Task> historyList; // почему ее предлагает сделать final, если она будет постоянно изменяться?
+public class InMemoryHistoryManager implements HistoryManager {
+    private final ArrayList<Task> historyList; // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
     private static final int HISTORY_LIST_MAX_SIZE = 10;
     @Override
     public void add(Task task) {
@@ -23,7 +23,7 @@ public class InMemoryHistoryManager implements HistoryManager { // где поч
         this.historyList = new ArrayList<>();
     }
 
-    static InMemoryHistoryManager getInstance(){
+    public static InMemoryHistoryManager getInstance(){
         if (InMemoryHistoryManager.inMemoryHistoryManager == null) {
             InMemoryHistoryManager.inMemoryHistoryManager = new InMemoryHistoryManager();
         }

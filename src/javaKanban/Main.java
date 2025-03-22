@@ -4,6 +4,7 @@ import javaKanban.entity.Epic;
 import javaKanban.entity.Status;
 import javaKanban.entity.Subtask;
 import javaKanban.entity.Task;
+import javaKanban.manager.task.InMemoryTaskManager;
 
 public class Main {
 
@@ -29,27 +30,18 @@ public class Main {
         Subtask subtask1 = new Subtask("подзадача1", " Тема подзадачи 1", epic.getId());
         Subtask subtask2 = new Subtask("подзадача2", " Тема подзадачи 2", epic.getId());
 
-        System.out.println("тут история пустая");
-        System.out.println(inMemoryTaskManager.getHistory());
-
-        System.out.println("тут  появился 1 элемент в истории");
-        inMemoryTaskManager.putNewSubtask(subtask1); // почему появляется в истории?
-        System.out.println(inMemoryTaskManager.getHistory());
-
-        System.out.println("тут  второй");
+        inMemoryTaskManager.putNewSubtask(subtask1);
         inMemoryTaskManager.putNewSubtask(subtask2);
+
+        System.out.println("тут история пустая");
         System.out.println(inMemoryTaskManager.getHistory());
 
         System.out.println("все эпики (пока один) " + inMemoryTaskManager.getAllEpics());
         System.out.println("все подзадачи " + inMemoryTaskManager.getAllSubtasks());
 
-
-
         inMemoryTaskManager.putNewEpic(new Epic("Эпик2", "Тема эпика 2"));
         System.out.println("\nдобавил второй эпик " + inMemoryTaskManager.getAllEpics());
         inMemoryTaskManager.deleteEpicById(6);
-
-        System.out.println(inMemoryTaskManager.getHistory());
 
         System.out.println("\nизменить статус задачи1");
         System.out.println("было  " + inMemoryTaskManager.getAllTasks());
@@ -59,8 +51,6 @@ public class Main {
         System.out.println("\n изменить статус эпика через изменение статуса in Progress:");
         inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5, Status.IN_PROGRESS, 3));
 
-
-        //taskManager.updateEpicStatus(epic);
         System.out.println(inMemoryTaskManager.getAllEpics());
         System.out.println(inMemoryTaskManager.getAllSubtasks());
 
@@ -69,21 +59,6 @@ public class Main {
         inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5, Status.DONE, 3));
         System.out.println(inMemoryTaskManager.getAllSubtasks());
         System.out.println(inMemoryTaskManager.getAllEpics());
-
-
-        System.out.println("------------------");
-//        System.out.println(inMemoryTaskManager.getAllTasks());
-//        System.out.println(inMemoryTaskManager.getAllEpics());
-//        System.out.println(inMemoryTaskManager.getAllSubtasks());
-        System.out.println(inMemoryTaskManager.getHistory());
-        System.out.println("------------------");
-
-        System.out.println("тест истории");
-//        inMemoryTaskManager.getTaskById(1);
-//        inMemoryTaskManager.getEpicById(3);
-//        inMemoryTaskManager.getSubtaskById(4);
-//        System.out.println(inMemoryTaskManager.getHistory());
-        System.out.println("тест истории");
 
         System.out.println("\n удалить задачу");
         System.out.println("было " + inMemoryTaskManager.getAllTasks());

@@ -1,4 +1,4 @@
-package javaKanban;
+package javaKanban.manager.history;
 
 import javaKanban.entity.Task;
 

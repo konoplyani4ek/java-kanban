@@ -1,4 +1,4 @@
-package javaKanban;
+package javaKanban.manager.task;
 
 import javaKanban.entity.Epic;
 import javaKanban.entity.Subtask;
@@ -7,9 +7,6 @@ import javaKanban.entity.Task;
 import java.util.ArrayList;
 
 public interface TaskManager {
-
-
-    long generateNewId();
 
     ArrayList<Task> getAllTasks();
 
@@ -48,8 +45,6 @@ public interface TaskManager {
     void deleteEpicById(long id);
 
     ArrayList<Subtask> getSubtasksByEpic(Epic epic);
-
-    void updateEpicStatus(Epic epic);
 
     ArrayList<Task> getHistory();
 }

@@ -1,9 +1,11 @@
-package javaKanban;
+package javaKanban.manager.task;
 
+import javaKanban.manager.Managers;
 import javaKanban.entity.Epic;
 import javaKanban.entity.Status;
 import javaKanban.entity.Subtask;
 import javaKanban.entity.Task;
+import javaKanban.manager.history.HistoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +15,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     private long taskIdCounter = 1;
 
-    private HashMap<Long, Task> taskHashMap;
-    private HashMap<Long, Subtask> subtaskHashMap;
-    private HashMap<Long, Epic> epicHashMap;
+    private final HashMap<Long, Task> taskHashMap; // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
+    private final HashMap<Long, Subtask> subtaskHashMap;
+    private final HashMap<Long, Epic> epicHashMap;
 
-    private HistoryManager historyManager = Managers.getDefaultHistory(); // почему интерфейсу вызываем метод, где будет вызван класс, а не Класс = Класс
+    private final HistoryManager historyManager = Managers.getDefaultHistory();  //не понял какой конструктор нужен в Managers
     private static InMemoryTaskManager inMemoryTaskManager; // чтобы содержался только один объект
 
     private InMemoryTaskManager() { // приватный конструктор для синглтон
@@ -26,15 +28,14 @@ public class InMemoryTaskManager implements TaskManager {
         this.epicHashMap = new HashMap<>();
     }
 
-    static InMemoryTaskManager getInstance() { // вызвать один раз в мейне для создания экземпляра
+    public static InMemoryTaskManager getInstance() { // вызвать один раз в мейне для создания экземпляра
         if (InMemoryTaskManager.inMemoryTaskManager == null) {
             InMemoryTaskManager.inMemoryTaskManager = new InMemoryTaskManager();
         }
         return InMemoryTaskManager.inMemoryTaskManager;
     }
 
-    @Override
-    public long generateNewId() {
+    private long generateNewId() {
         return taskIdCounter++;
     }
 
@@ -74,23 +75,25 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskById(long id) {  // в мейн классе некорректно отрабатывает, появляются лишние записи в истории
-        historyManager.add(taskHashMap.get(id));
-        return taskHashMap.get(id);
+    public Task getTaskById(long id) {
+        Task task = taskHashMap.get(id);// чтобы два раза не читать map.get(id), создается объект
+        historyManager.add(task);
+        return task; // и возвращается
     }
 
     @Override
     public Subtask getSubtaskById(long id) {
-        historyManager.add(subtaskHashMap.get(id));
-        return subtaskHashMap.get(id);
+        Subtask subtask = subtaskHashMap.get(id);
+        historyManager.add(subtask);
+        return subtask;
     }
 
     @Override
     public Epic getEpicById(long id) {
-        historyManager.add(epicHashMap.get(id));
-        return epicHashMap.get(id);
+        Epic epic = epicHashMap.get(id);
+        historyManager.add(epic);
+        return epic;
     }
-
 
     @Override
     public void putNewTask(Task task) {
@@ -100,9 +103,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void putNewSubtask(Subtask subtask) {
-        Epic epic = getEpicById(subtask.getEpicId());
+        Epic epic = epicHashMap.get(subtask.getEpicId());
         if (epic == null) {
-            System.out.println("\nЭпика с  номером " + subtask.getEpicId() + " не существует");
+            throw new RuntimeException("Такой Subtask добавить нельзя ");
         } else {
             subtask.setId(generateNewId());
             subtaskHashMap.put(subtask.getId(), subtask);
@@ -167,8 +170,8 @@ public class InMemoryTaskManager implements TaskManager {
         return subtasksById;
     }
 
-    @Override
-    public void updateEpicStatus(Epic epic) { // метод внутреннего пользования
+
+    private void updateEpicStatus(Epic epic) { // метод внутреннего пользования
         if (epic.getSubtasksId().isEmpty()) {
             epic.setStatus(Status.NEW);
         } else {
