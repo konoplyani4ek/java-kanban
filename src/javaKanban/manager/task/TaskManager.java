@@ -26,17 +26,17 @@ public interface TaskManager {
 
     Epic getEpicById(long id);
 
-    void putNewTask(Task task);
+    Task putNewTask(Task task);
 
-    void putNewSubtask(Subtask subtask);
+    Subtask putNewSubtask(Subtask subtask);
 
-    void putNewEpic(Epic epic);
+    Epic putNewEpic(Epic epic);
 
-    void updateTask(Task task);
+    Task updateTask(Task task);
 
-    void updateSubtask(Subtask subtask);
+    Subtask updateSubtask(Subtask subtask);
 
-    void updateEpic(Epic epic);
+    Epic updateEpic(Epic epic);
 
     void deleteTaskById(long id);
 

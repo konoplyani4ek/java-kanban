@@ -6,6 +6,7 @@ import javaKanban.entity.Status;
 import javaKanban.entity.Subtask;
 import javaKanban.entity.Task;
 import javaKanban.manager.history.HistoryManager;
+import javaKanban.manager.history.InMemoryHistoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,21 +19,20 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Long, Task> taskHashMap; // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
     private final HashMap<Long, Subtask> subtaskHashMap;
     private final HashMap<Long, Epic> epicHashMap;
+    private final HistoryManager historyManager;
 
-    private final HistoryManager historyManager = Managers.getDefaultHistory();  //не понял какой конструктор нужен в Managers
-    private static InMemoryTaskManager inMemoryTaskManager; // чтобы содержался только один объект
-
-    private InMemoryTaskManager() { // приватный конструктор для синглтон
+    public InMemoryTaskManager(HistoryManager historyManager) {
         this.taskHashMap = new HashMap<>();
         this.subtaskHashMap = new HashMap<>();
         this.epicHashMap = new HashMap<>();
+        this.historyManager = historyManager;
     }
 
-    public static InMemoryTaskManager getInstance() { // вызвать один раз в мейне для создания экземпляра
-        if (InMemoryTaskManager.inMemoryTaskManager == null) {
-            InMemoryTaskManager.inMemoryTaskManager = new InMemoryTaskManager();
-        }
-        return InMemoryTaskManager.inMemoryTaskManager;
+    public InMemoryTaskManager() {
+        this.taskHashMap = new HashMap<>();
+        this.subtaskHashMap = new HashMap<>();
+        this.epicHashMap = new HashMap<>();
+        this.historyManager = new InMemoryHistoryManager();
     }
 
     private long generateNewId() {
@@ -96,15 +96,16 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void putNewTask(Task task) {
+    public Task putNewTask(Task task) {
         task.setId(generateNewId());
         taskHashMap.put(task.getId(), task);
+        return task;
     }
 
     @Override
-    public void putNewSubtask(Subtask subtask) {
+    public Subtask putNewSubtask(Subtask subtask) {
         Epic epic = epicHashMap.get(subtask.getEpicId());
-        if (epic == null) {
+        if (epic == null) { // long epic.id или subtask.id не могут быть null, хотя в Task они Long(не long)
             throw new RuntimeException("Такой Subtask добавить нельзя ");
         } else {
             subtask.setId(generateNewId());
@@ -112,29 +113,34 @@ public class InMemoryTaskManager implements TaskManager {
             epic.addSubtaskId(subtask.getId());
             updateEpicStatus(epic);
         }
+        return subtask;
     }
 
     @Override
-    public void putNewEpic(Epic epic) {
+    public Epic putNewEpic(Epic epic) {
         epic.setId(generateNewId());
         epicHashMap.put(epic.getId(), epic);
+        return epic;
     }
 
     @Override
-    public void updateTask(Task task) {
+    public Task updateTask(Task task) {
         taskHashMap.put(task.getId(), task);
+        return task;
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
+    public Subtask updateSubtask(Subtask subtask) {
         subtaskHashMap.put(subtask.getId(), subtask);
         Epic epic = getEpicById(subtask.getEpicId());
         updateEpicStatus(epic);
+        return subtask;
     }
 
     @Override
-    public void updateEpic(Epic epic) {
+    public Epic updateEpic(Epic epic) {
         epicHashMap.put(epic.getId(), epic);
+        return epic;
     }
 
     @Override
@@ -197,6 +203,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    @Override
     public ArrayList<Task> getHistory() {
         System.out.println("Ваша история поиска");
         return historyManager.getHistory();

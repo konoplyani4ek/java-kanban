@@ -7,15 +7,12 @@ import javaKanban.manager.task.TaskManager;
 
 public class Managers {
 
-    public static TaskManager getDefault() {
-        return InMemoryTaskManager.getInstance();
+    public static TaskManager getDefault(HistoryManager historyManager) {
+        return new InMemoryTaskManager(historyManager);
     }
 
-//    public static TaskManager getDefault(TaskManager taskManager) { // не понимаю какой конструктор с параметрами нужно сделать
-//
+
+//    public static HistoryManager getDefaultHistory() { // возвращаем  объект, который имплементирует интерфейс
+//        return InMemoryHistoryManager.getInstance(); //  можно заменить на другой менеджер, чтобы без доп действий поменять реализации
 //    }
-
-    public static HistoryManager getDefaultHistory() { // возвращаем  объект, который имплементирует интерфейс
-        return InMemoryHistoryManager.getInstance(); //  можно заменить на другой менеджер, чтобы без доп действий поменять реализации
-    }
 }

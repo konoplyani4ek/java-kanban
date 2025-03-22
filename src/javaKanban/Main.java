@@ -4,12 +4,15 @@ import javaKanban.entity.Epic;
 import javaKanban.entity.Status;
 import javaKanban.entity.Subtask;
 import javaKanban.entity.Task;
+import javaKanban.manager.history.HistoryManager;
+import javaKanban.manager.history.InMemoryHistoryManager;
 import javaKanban.manager.task.InMemoryTaskManager;
 
 public class Main {
 
-    public static void main(String[] args) { // можно удалять?
-        InMemoryTaskManager inMemoryTaskManager = InMemoryTaskManager.getInstance();
+    public static void main(String[] args) { // можно удалять
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManager);
 
         System.out.println("задачи:");
         Task task1 = new Task("Задача1", "Тема задачи 1");

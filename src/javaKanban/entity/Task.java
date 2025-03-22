@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class Task {
 
-    private String name; // почему тогда и тут предлагает сделать final? ведь она тоже может быть изменена через методы
+    private String name; // почему тогда и тут предлагает сделать final? ведь она тоже может быть изменена через методы?
     private String description;
-    private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется
+    private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
 
 

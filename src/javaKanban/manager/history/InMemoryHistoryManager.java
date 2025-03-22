@@ -18,15 +18,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     public ArrayList<Task> getHistory() {
         return historyList;
     }
-    private static InMemoryHistoryManager inMemoryHistoryManager;
-    private InMemoryHistoryManager(){
+
+    public InMemoryHistoryManager(){
         this.historyList = new ArrayList<>();
     }
 
-    public static InMemoryHistoryManager getInstance(){
-        if (InMemoryHistoryManager.inMemoryHistoryManager == null) {
-            InMemoryHistoryManager.inMemoryHistoryManager = new InMemoryHistoryManager();
-        }
-        return InMemoryHistoryManager.inMemoryHistoryManager;
-    }
 }
