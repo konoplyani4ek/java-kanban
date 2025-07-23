@@ -10,7 +10,6 @@ public class Task {
     private Status status;
 
 
-
     @Override
     public boolean equals(Object object) { // в наследниках такой же
         if (this == object) return true;
@@ -54,7 +53,7 @@ public class Task {
         this.status = Status.NEW;
     }
 
-    public Task(String name, String description, long id, Status status){
+    public Task(String name, String description, long id, Status status) {
         this.name = name;
         this.description = description;
         this.id = id;
