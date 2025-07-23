@@ -2,7 +2,7 @@ package javaKanban.entity;
 
 public class Subtask extends Task {
 
-    private long epicId;
+    private final long epicId;
 
     public Subtask(String name, String description, long epicId) {
         super(name, description);

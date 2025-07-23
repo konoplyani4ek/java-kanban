@@ -44,6 +44,10 @@ public class Task {
         return name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public Task(String name, String description) {
         this.name = name;
         this.description = description;

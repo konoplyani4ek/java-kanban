@@ -2,10 +2,11 @@ package javaKanban.manager.history;
 
 import javaKanban.entity.Task;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface HistoryManager {
 
     void add(Task task);
-    ArrayList<Task> getHistory();
+    void remove(long id);
+    List<Task> getHistory();
 }

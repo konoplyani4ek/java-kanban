@@ -21,6 +21,10 @@ public class Main {
         inMemoryTaskManager.putNewTask(task2);
         System.out.println(inMemoryTaskManager.getAllTasks());
 
+        // проверяю вывод истории со своей реализацией листа
+        inMemoryTaskManager.getTaskById(1);
+        System.out.println(inMemoryTaskManager.getHistory());
+
         System.out.println("\nэпик с двумя подзадачами:");
 
         System.out.println("сам эпик");
@@ -35,9 +39,6 @@ public class Main {
 
         inMemoryTaskManager.putNewSubtask(subtask1);
         inMemoryTaskManager.putNewSubtask(subtask2);
-
-        System.out.println("тут история пустая");
-        System.out.println(inMemoryTaskManager.getHistory());
 
         System.out.println("все эпики (пока один) " + inMemoryTaskManager.getAllEpics());
         System.out.println("все подзадачи " + inMemoryTaskManager.getAllSubtasks());
@@ -73,7 +74,6 @@ public class Main {
         System.out.println("\n статус эпика тоже изменился \n " + inMemoryTaskManager.getAllEpics());
         inMemoryTaskManager.deleteSubtaskById(7);
         System.out.println("\n удалил его \n " + inMemoryTaskManager.getAllSubtasks());
-
 
         System.out.println("\n удалить эпик");
         System.out.println("было " + inMemoryTaskManager.getAllEpics());
