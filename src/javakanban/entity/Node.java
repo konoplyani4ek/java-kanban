@@ -1,4 +1,4 @@
-package javaKanban.entity;
+package javakanban.entity;
 
 public class Node {
 

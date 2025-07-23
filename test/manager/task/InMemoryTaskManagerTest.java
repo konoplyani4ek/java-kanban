@@ -1,9 +1,9 @@
 package manager.task;
 
-import javaKanban.entity.*;
-import javaKanban.manager.history.InMemoryHistoryManager;
-import javaKanban.manager.task.InMemoryTaskManager;
-import javaKanban.manager.task.TaskManager;
+import javakanban.entity.*;
+import javakanban.manager.history.InMemoryHistoryManager;
+import javakanban.manager.task.InMemoryTaskManager;
+import javakanban.manager.task.TaskManager;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;

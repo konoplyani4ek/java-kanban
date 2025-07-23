@@ -1,4 +1,4 @@
-package javaKanban.entity;
+package javakanban.entity;
 
 import java.util.ArrayList;
 
