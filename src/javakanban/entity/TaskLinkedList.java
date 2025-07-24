@@ -45,9 +45,8 @@ public class TaskLinkedList {
             head = node.getNext(); // берем СЛЕДУЮЩИЙ у ноды
         }
         if (node.getNext() != null) { // если есть СЛЕДУЮЩИЙ
-            node.getNext().setPrev(node.getPrev());
-        } // то ПЕРЕД у СЛЕДУЮЩЕГО будет ПЕРЕД от НОДЫ
-        else { // ЕСЛИ СЛЕДУЮЩЕГО нет, значит нода = TAIL
+            node.getNext().setPrev(node.getPrev()); // то ПЕРЕД у СЛЕДУЮЩЕГО будет ПЕРЕД от НОДЫ
+        } else { // ЕСЛИ СЛЕДУЮЩЕГО нет, значит нода = TAIL
             tail = node.getPrev(); // берем ПЕРЕД у ноды
         }
         nodeMap.remove(node.getTask().getId());
