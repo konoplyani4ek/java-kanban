@@ -220,7 +220,7 @@ public class InMemoryTaskManagerTest {
         assertTrue(taskManager.getHistory().contains(subtask));
     }
 
-    @Test
+    @Test //новый тест
     void getHistory_addToHistory_whenGetSameTask() {
         Task task1 = taskManager.putNewTask(buildTask());
         Task task2 = taskManager.putNewTask(buildTask());
@@ -242,7 +242,7 @@ public class InMemoryTaskManagerTest {
         assertNotEquals(epic.getId(), subtask.getId());
     }
 
-    @Test
+    @Test // новый тест
     void deleteSubtaskById_EpicSubtaskListIsEmpty_whenDeleteSubtask(){
         Epic epic = taskManager.putNewEpic(buildEpic());//id 1
         Subtask subtask = taskManager.putNewSubtask(buildSubtask(epic)); // id 2
