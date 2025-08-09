@@ -1,8 +1,7 @@
 package entity;
 
-import javaKanban.entity.Epic;
-import javaKanban.entity.Status;
-import org.junit.jupiter.api.Assertions;
+import javakanban.entity.Epic;
+import javakanban.entity.Status;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 public class EpicTest {

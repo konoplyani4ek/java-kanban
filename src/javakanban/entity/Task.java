@@ -1,4 +1,4 @@
-package javaKanban.entity;
+package javakanban.entity;
 
 import java.util.Objects;
 
@@ -8,7 +8,6 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
-
 
 
     @Override
@@ -44,13 +43,17 @@ public class Task {
         return name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
     }
 
-    public Task(String name, String description, long id, Status status){
+    public Task(String name, String description, long id, Status status) {
         this.name = name;
         this.description = description;
         this.id = id;

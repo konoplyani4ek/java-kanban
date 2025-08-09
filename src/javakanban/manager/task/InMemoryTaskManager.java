@@ -1,15 +1,14 @@
-package javaKanban.manager.task;
+package javakanban.manager.task;
 
-import javaKanban.manager.Managers;
-import javaKanban.entity.Epic;
-import javaKanban.entity.Status;
-import javaKanban.entity.Subtask;
-import javaKanban.entity.Task;
-import javaKanban.manager.history.HistoryManager;
-import javaKanban.manager.history.InMemoryHistoryManager;
+import javakanban.entity.Epic;
+import javakanban.entity.Status;
+import javakanban.entity.Subtask;
+import javakanban.entity.Task;
+import javakanban.manager.history.HistoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class InMemoryTaskManager implements TaskManager {
@@ -26,13 +25,6 @@ public class InMemoryTaskManager implements TaskManager {
         this.subtaskHashMap = new HashMap<>();
         this.epicHashMap = new HashMap<>();
         this.historyManager = historyManager;
-    }
-
-    public InMemoryTaskManager() {
-        this.taskHashMap = new HashMap<>();
-        this.subtaskHashMap = new HashMap<>();
-        this.epicHashMap = new HashMap<>();
-        this.historyManager = new InMemoryHistoryManager();
     }
 
     private long generateNewId() {
@@ -204,7 +196,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
+    public List<Task> getHistory() {
         System.out.println("Ваша история поиска");
         return historyManager.getHistory();
     }
