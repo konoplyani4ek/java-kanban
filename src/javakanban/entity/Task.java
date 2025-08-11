@@ -8,6 +8,11 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
+    private Type type;
+
+    public Task() {
+
+    }
 
 
     @Override
@@ -47,25 +52,51 @@ public class Task {
         return description;
     }
 
-    public Task(String name, String description) {
+    public Task(String name, String description, Type type) {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
+        this.type = type;
+
     }
 
-    public Task(String name, String description, long id, Status status) {
+    public Task(String name, String description, long id, Status status, Type type) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
+        this.type = type;
+
+    }
+
+    public Task(Long id, Type type, String name, Status status, String description) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+        this.type = type;
+
     }
 
     @Override
     public String toString() {
-        return getClass().getName() + ": " +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status;
+        return id + "," +
+                type + "," +
+                name + "," +
+                status + "," +
+                description;
     }
+
+    public static Task fromString(String value) {
+        String[] parts = value.split(",");
+        Task task = new Task();
+        task.id = Long.parseLong(parts[0]);
+        task.type = Type.valueOf(parts[1]);
+        task.name = parts[2];
+        task.status = Status.valueOf(parts[3]);
+        task.description = parts[4];
+        return task;
+    }
+
+
 }

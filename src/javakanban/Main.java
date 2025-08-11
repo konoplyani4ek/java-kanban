@@ -1,9 +1,6 @@
 package javakanban;
 
-import javakanban.entity.Epic;
-import javakanban.entity.Status;
-import javakanban.entity.Subtask;
-import javakanban.entity.Task;
+import javakanban.entity.*;
 import javakanban.manager.history.HistoryManager;
 import javakanban.manager.history.InMemoryHistoryManager;
 import javakanban.manager.task.InMemoryTaskManager;
@@ -15,8 +12,8 @@ public class Main {
         InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManager);
 
         System.out.println("задачи:");
-        Task task1 = new Task("Задача1", "Тема задачи 1");
-        Task task2 = new Task("Задача2", "Тема задачи 2");
+        Task task1 = new Task("Задача1", "Тема задачи 1", Type.Task);
+        Task task2 = new Task("Задача2", "Тема задачи 2",Type.Task);
         inMemoryTaskManager.putNewTask(task1);
         inMemoryTaskManager.putNewTask(task2);
         System.out.println(inMemoryTaskManager.getAllTasks());
