@@ -1,12 +1,12 @@
-package javakanban;
+package javaKanban;
 
-import javakanban.entity.Epic;
-import javakanban.entity.Status;
-import javakanban.entity.Subtask;
-import javakanban.entity.Task;
-import javakanban.manager.history.HistoryManager;
-import javakanban.manager.history.InMemoryHistoryManager;
-import javakanban.manager.task.InMemoryTaskManager;
+import javaKanban.entity.Epic;
+import javaKanban.entity.Status;
+import javaKanban.entity.Subtask;
+import javaKanban.entity.Task;
+import javaKanban.manager.history.HistoryManager;
+import javaKanban.manager.history.InMemoryHistoryManager;
+import javaKanban.manager.task.InMemoryTaskManager;
 
 public class Main {
 
@@ -20,10 +20,6 @@ public class Main {
         inMemoryTaskManager.putNewTask(task1);
         inMemoryTaskManager.putNewTask(task2);
         System.out.println(inMemoryTaskManager.getAllTasks());
-
-        // проверяю вывод истории со своей реализацией листа
-        inMemoryTaskManager.getTaskById(1);
-        System.out.println(inMemoryTaskManager.getHistory());
 
         System.out.println("\nэпик с двумя подзадачами:");
 
@@ -39,6 +35,9 @@ public class Main {
 
         inMemoryTaskManager.putNewSubtask(subtask1);
         inMemoryTaskManager.putNewSubtask(subtask2);
+
+        System.out.println("тут история пустая");
+        System.out.println(inMemoryTaskManager.getHistory());
 
         System.out.println("все эпики (пока один) " + inMemoryTaskManager.getAllEpics());
         System.out.println("все подзадачи " + inMemoryTaskManager.getAllSubtasks());
@@ -74,6 +73,7 @@ public class Main {
         System.out.println("\n статус эпика тоже изменился \n " + inMemoryTaskManager.getAllEpics());
         inMemoryTaskManager.deleteSubtaskById(7);
         System.out.println("\n удалил его \n " + inMemoryTaskManager.getAllSubtasks());
+
 
         System.out.println("\n удалить эпик");
         System.out.println("было " + inMemoryTaskManager.getAllEpics());

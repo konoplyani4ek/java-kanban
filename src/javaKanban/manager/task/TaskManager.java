@@ -1,11 +1,10 @@
-package javakanban.manager.task;
+package javaKanban.manager.task;
 
-import javakanban.entity.Epic;
-import javakanban.entity.Subtask;
-import javakanban.entity.Task;
+import javaKanban.entity.Epic;
+import javaKanban.entity.Subtask;
+import javaKanban.entity.Task;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public interface TaskManager {
 
@@ -47,5 +46,5 @@ public interface TaskManager {
 
     ArrayList<Subtask> getSubtasksByEpic(Epic epic);
 
-    List<Task> getHistory();
+    ArrayList<Task> getHistory();
 }

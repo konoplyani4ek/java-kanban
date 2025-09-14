@@ -1,7 +1,7 @@
 package entity;
 
-import javakanban.entity.Status;
-import javakanban.entity.Subtask;
+import javaKanban.entity.Status;
+import javaKanban.entity.Subtask;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

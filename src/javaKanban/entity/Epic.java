@@ -1,4 +1,4 @@
-package javakanban.entity;
+package javaKanban.entity;
 
 import java.util.ArrayList;
 
@@ -21,11 +21,12 @@ public class Epic extends Task {
         super(name, description);
         this.subtasksId = new ArrayList<>();
     }
-
     public Epic(String name, String description, long id, Status status) {
         super(name, description, id, status);
         this.subtasksId = new ArrayList<>();
     }
+
+
 
 
     @Override
