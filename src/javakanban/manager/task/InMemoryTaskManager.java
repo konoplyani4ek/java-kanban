@@ -4,6 +4,7 @@ import javakanban.entity.Epic;
 import javakanban.entity.Status;
 import javakanban.entity.Subtask;
 import javakanban.entity.Task;
+import javakanban.manager.Managers;
 import javakanban.manager.history.HistoryManager;
 
 import java.util.ArrayList;
@@ -15,17 +16,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     private long taskIdCounter = 1;
 
-    private final HashMap<Long, Task> taskHashMap; // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
-    private final HashMap<Long, Subtask> subtaskHashMap;
-    private final HashMap<Long, Epic> epicHashMap;
-    private final HistoryManager historyManager;
-
-    public InMemoryTaskManager(HistoryManager historyManager) {
-        this.taskHashMap = new HashMap<>();
-        this.subtaskHashMap = new HashMap<>();
-        this.epicHashMap = new HashMap<>();
-        this.historyManager = historyManager;
-    }
+    protected final HashMap<Long, Task> taskHashMap = new HashMap<>();
+    // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
+    protected final HashMap<Long, Subtask> subtaskHashMap = new HashMap<>();
+    protected final HashMap<Long, Epic> epicHashMap = new HashMap<>();
+    private final HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
     private long generateNewId() {
         return taskIdCounter++;
@@ -116,22 +111,34 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task updateTask(Task task) {
-        taskHashMap.put(task.getId(), task);
+    public Task updateTask(Long id, Task task) {
+        if (!taskHashMap.containsKey(id)) {
+            throw new IllegalArgumentException("Task with id " + id + " not found.");
+        }
+        task.setId(id);
+        taskHashMap.put(id, task);
         return task;
     }
 
     @Override
-    public Subtask updateSubtask(Subtask subtask) {
-        subtaskHashMap.put(subtask.getId(), subtask);
+    public Subtask updateSubtask(Long id, Subtask subtask) {
+        if (!subtaskHashMap.containsKey(id)) {
+            throw new IllegalArgumentException("Subtask with id " + id + " not found.");
+        }
+        subtask.setId(id);
+        subtaskHashMap.put(id, subtask);
         Epic epic = getEpicById(subtask.getEpicId());
         updateEpicStatus(epic);
         return subtask;
     }
 
     @Override
-    public Epic updateEpic(Epic epic) {
-        epicHashMap.put(epic.getId(), epic);
+    public Epic updateEpic(Long id, Epic epic) {
+        if (!epicHashMap.containsKey(id)) {
+            throw new IllegalArgumentException("Epic with id " + id + " not found.");
+        }
+        epic.setId(id);
+        epicHashMap.put(id, epic);
         return epic;
     }
 

@@ -8,7 +8,7 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
-
+    private TaskType taskType = TaskType.TASK;
 
     @Override
     public boolean equals(Object object) { // в наследниках такой же
@@ -47,25 +47,56 @@ public class Task {
         return description;
     }
 
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
     }
 
-    public Task(String name, String description, long id, Status status) {
+    public Task(String name, String description, Status status) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    } // для апдейта
+
+    public Task(Long id, TaskType taskType, String name, Status status, String description) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
-    }
+        this.taskType = taskType;
+    } // этот конструктор нужен для inMemoryTaskManager
 
     @Override
     public String toString() {
-        return getClass().getName() + ": " +
+        return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
-                ", status=" + status;
+                ", status=" + status +
+                ", taskType=" + taskType +
+                '}';
+    }
+
+    public String toStringCSV() { // у Epic такой же
+        return String.format("%d,%s,%s,%s,%s",
+                getId(),
+                getTaskType(),
+                getName(),
+                getStatus(),
+                getDescription()
+        );
     }
 }
+
+
+
