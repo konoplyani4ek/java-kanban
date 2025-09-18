@@ -118,10 +118,10 @@ public class InMemoryTaskManagerTest {
 
     @Test
     void updateTask_changeNameValue() {
-        Task task1 = taskManager.putNewTask(buildTask());
-        Task updateTask1 = new Task("НоваяЗадача1", "Описание задачи1",
-                task1.getId(), Status.NEW);
-        taskManager.updateTask(updateTask1);
+        Task task1 = taskManager.putNewTask(buildTask()); // id = 1
+        Task updateTask1 = new Task("НоваяЗадача1", "Описание задачи1");
+        System.out.println(taskManager.getAllTasks());
+        taskManager.updateTask(task1.getId(), updateTask1);
         assertEquals("НоваяЗадача1", taskManager.getTaskById(1).getName());
     }
 
@@ -130,8 +130,8 @@ public class InMemoryTaskManagerTest {
         Task task1 = taskManager.putNewTask(buildTask());
         assertEquals(Status.NEW, task1.getStatus());
         Task updateTask1 = new Task("НоваяЗадача1", "Описание задачи1",
-                task1.getId(), Status.IN_PROGRESS);
-        taskManager.updateTask(updateTask1);
+                Status.IN_PROGRESS);
+        taskManager.updateTask(task1.getId(), updateTask1);
         assertEquals(Status.IN_PROGRESS, taskManager.getTaskById(1).getStatus());
     }
 
@@ -142,7 +142,7 @@ public class InMemoryTaskManagerTest {
         Subtask subtask1 = taskManager.putNewSubtask(buildSubtask(epic));
         assertEquals(Status.NEW, subtask1.getStatus());
         assertEquals(Status.NEW, epic.getStatus());
-        taskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", subtask1.getId(), Status.IN_PROGRESS, epic.getId()));
+        taskManager.updateSubtask(2L, new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", subtask1.getId(), Status.IN_PROGRESS, epic.getId()));
         assertEquals(Status.IN_PROGRESS, taskManager.getSubtaskById(2).getStatus());
         assertEquals(Status.IN_PROGRESS, taskManager.getEpicById(1).getStatus());
     }
@@ -152,8 +152,8 @@ public class InMemoryTaskManagerTest {
         Epic epic = taskManager.putNewEpic(buildEpic());
         Subtask subtask1 = taskManager.putNewSubtask(buildSubtask(epic));
         Subtask subtask2 = taskManager.putNewSubtask(buildSubtask(epic));
-        taskManager.updateSubtask(new Subtask("subtask1", "subtask1disc", subtask1.getId(), Status.DONE, epic.getId()));
-        taskManager.updateSubtask(new Subtask("subtask2", "subtask2disc", subtask2.getId(), Status.DONE, epic.getId()));
+        taskManager.updateSubtask(2L, new Subtask("subtask1", "subtask1disc", subtask1.getId(), Status.DONE, epic.getId()));
+        taskManager.updateSubtask(3L, new Subtask("subtask2", "subtask2disc", subtask2.getId(), Status.DONE, epic.getId()));
         assertEquals(Status.DONE, taskManager.getSubtaskById(2).getStatus());
         assertEquals(Status.DONE, taskManager.getSubtaskById(3).getStatus());
         assertEquals(Status.DONE, taskManager.getEpicById(1).getStatus());

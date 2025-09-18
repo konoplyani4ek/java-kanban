@@ -1,6 +1,7 @@
 package manager.task;
 
 import javakanban.entity.*;
+import javakanban.manager.CsvConverter;
 import javakanban.manager.task.FileBackedTaskManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -16,25 +17,21 @@ public class FileBackedTaskManagerTest {
     @TempDir
     File tempDir;
 
-    private final FileBackedTaskManager manager = new FileBackedTaskManager(null);
-
-
     @Test
     void fromString_shouldReturnTask_whenTypeIsTask() {
         String line = "1,TASK,Сходить в магазин,NEW,Купить молоко";
 
-        Task task = manager.fromString(line);
+        Task task = CsvConverter.fromString(line);
 
         assertNotNull(task);
-        assertTrue(task instanceof Task);
+        assertInstanceOf(Task.class, task);
         assertEquals(1L, task.getId());
-        assertEquals(TaskType.TASK, task.getType());
+        assertEquals(TaskType.TASK, task.getTaskType());
         assertEquals("Сходить в магазин", task.getName());
         assertEquals(Status.NEW, task.getStatus());
         assertEquals("Купить молоко", task.getDescription());
     }
 
-    //этот тест не работает. неправильно парсит и я не могу найти ошибку java.lang.NumberFormatException: For input string: "и"
     @Test
     void loadFromFile_shouldLoadTasksCorrectly() throws IOException {
         // Создаём временный файл
@@ -55,7 +52,7 @@ public class FileBackedTaskManagerTest {
         // Проверяем, что задачи добавлены
         Task task = manager.getTaskById(1L);
         assertNotNull(task);
-        assertEquals(TaskType.TASK, task.getType());
+        assertEquals(TaskType.TASK, task.getTaskType());
         assertEquals("Сходить в магазин", task.getName());
 
         Epic epic = manager.getEpicById(2L);

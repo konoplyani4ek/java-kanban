@@ -1,13 +1,11 @@
 package javakanban.manager.task;
 
 import javakanban.entity.*;
+import javakanban.manager.CsvConverter;
 import javakanban.manager.ManagerSaveException;
-
+import javakanban.manager.history.HistoryManager;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -16,6 +14,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file) {
         this.file = file;
     }
+
 
     @Override
     public void clearAllTasks() {
@@ -52,42 +51,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Task putNewTask(Task task) {
-        super.putNewTask(task);
+        taskHashMap.put(task.getId(), task);
         save();
         return task;
     }
 
     @Override
     public Subtask putNewSubtask(Subtask subtask) {
-        super.putNewSubtask(subtask);
+        subtaskHashMap.put(subtask.getId(), subtask);
         save();
         return subtask;
     }
 
     @Override
     public Epic putNewEpic(Epic epic) {
-        super.putNewEpic(epic);
+        epicHashMap.put(epic.getId(), epic);
         save();
         return epic;
     }
 
     @Override
-    public Task updateTask(Task task) {
-        super.updateTask(task);
+    public Task updateTask(Long id, Task task) {
+        super.updateTask(id, task);
         save();
         return task;
     }
 
     @Override
-    public Subtask updateSubtask(Subtask subtask) {
-        super.updateSubtask(subtask);
+    public Subtask updateSubtask(Long id, Subtask subtask) {
+        super.updateSubtask(id, subtask);
         save();
         return subtask;
     }
 
     @Override
-    public Epic updateEpic(Epic epic) {
-        super.updateEpic(epic);
+    public Epic updateEpic(Long id, Epic epic) {
+        super.updateEpic(id, epic);
         save();
         return epic;
     }
@@ -110,65 +109,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    @Override
-    public ArrayList<Subtask> getSubtasksByEpic(Epic epic) {
-        return super.getSubtasksByEpic(epic);
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return super.getHistory();
-    }
 
     private void save() {
         try (Writer writer = new FileWriter(file)) {
-            writer.write("id,type,name,status,description,epic\n");
+
             for (Task task : getAllTasks()) {
-                writer.write(task.toString());
+                writer.write(task.toStringCSV());
             }
             for (Epic epic : getAllEpics()) {
-                writer.write(epic.toString());
+                writer.write(epic.toStringCSV());
             }
             for (Subtask subtask : getAllSubtasks()) {
-                writer.write(subtask.toString());
+                writer.write(subtask.toStringCSV());
             }
         } catch (IOException exception) {
             throw new ManagerSaveException("ОШИБКА: данные не сохранены в файл");
-        }
-    }
-
-    private String toString(Task task) {
-        return String.format("%d,%s,%s,%s,%s",
-                task.getId(),
-                task.getType(),
-                task.getName(),
-                task.getStatus(),
-                task.getDescription()
-        );
-    }
-
-    public Task fromString(String value) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("Пустая или null строка не может быть распарсена");
-        }
-        String[] elements = value.split(",");
-        Long id = Long.parseLong(elements[0]);
-        TaskType taskType = TaskType.valueOf(elements[1]);
-        String name = elements[2];
-        Status status = Status.valueOf(elements[3]);
-        String description = elements[4];
-
-
-        switch (taskType) {
-            case TASK:
-                return new Task(id, taskType, name, status, description);
-            case EPIC:
-                return new Epic(id, taskType, name, status, description);
-            case SUBTASK:
-                Long epicId = Long.parseLong(elements[5]);
-                return new Subtask(id, taskType, name, status, description, epicId);
-            default:
-                throw new IllegalArgumentException("Unknown task type: " + taskType);
         }
     }
 
@@ -184,14 +139,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 String string = bufferedReader.readLine().trim();
 
                 if (!string.isEmpty()) {
-                    Task task = fileBackedTaskManager.fromString(string);
+                    Task task = CsvConverter.fromString(string);
 
-                    if (task instanceof Epic) {
-                        fileBackedTaskManager.putNewEpic((Epic) task);
-                    } else if (task instanceof Subtask) {
-                        fileBackedTaskManager.putNewSubtask((Subtask) task);
-                    } else {
-                        fileBackedTaskManager.putNewTask(task);
+                    switch (task.getTaskType()) {
+                        case EPIC:
+                            fileBackedTaskManager.putNewEpic((Epic) task);
+                            break;
+                        case SUBTASK:
+                            fileBackedTaskManager.putNewSubtask((Subtask) task);
+                            break;
+                        case TASK:
+                            fileBackedTaskManager.putNewTask(task);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Неизвестный тип задачи: " + task.getTaskType());
                     }
                 }
             }
@@ -202,4 +163,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         return fileBackedTaskManager;
     }
+
+
 }

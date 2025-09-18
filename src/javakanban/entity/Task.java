@@ -8,7 +8,7 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
-    private TaskType taskType;
+    private TaskType taskType = TaskType.TASK;
 
     @Override
     public boolean equals(Object object) { // в наследниках такой же
@@ -47,41 +47,26 @@ public class Task {
         return description;
     }
 
-    public TaskType getType() {
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
+    }
+
+    public TaskType getTaskType() {
         return taskType;
     }
+
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
-        this.taskType = TaskType.TASK;
     }
 
-    public Task() {
-    }
-
-    public Task(String name, String description, Long id, Status status) {
+    public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
-        this.status = Status.NEW;
-    }
-
-    public Task(String name, String description, TaskType taskType) {
-        this.name = name;
-        this.description = description;
-        this.taskType = taskType;
-        this.status = Status.NEW;
-    } // для создания эпиков и сабтасков
-
-    public Task(String name, String description, long id, Status status, TaskType taskType) {
-        this.name = name;
-        this.description = description;
-        this.id = id;
         this.status = status;
-        this.taskType = taskType;
-
-    }
+    } // для апдейта
 
     public Task(Long id, TaskType taskType, String name, Status status, String description) {
         this.name = name;
@@ -89,30 +74,29 @@ public class Task {
         this.id = id;
         this.status = status;
         this.taskType = taskType;
-
-    }
+    } // этот конструктор нужен для inMemoryTaskManager
 
     @Override
     public String toString() {
+        return "Task{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                ", taskType=" + taskType +
+                '}';
+    }
+
+    public String toStringCSV() { // у Epic такой же
         return String.format("%d,%s,%s,%s,%s",
-                id,
-                taskType,
-                name,
-                status,
-                description
+                getId(),
+                getTaskType(),
+                getName(),
+                getStatus(),
+                getDescription()
         );
     }
-
-    public static Task fromString(String value) {
-        String[] parts = value.split(",");
-        Task task = new Task();
-        task.id = Long.parseLong(parts[0]);
-        task.taskType = TaskType.valueOf(parts[1]);
-        task.name = parts[2];
-        task.status = Status.valueOf(parts[3]);
-        task.description = parts[4];
-        return task;
-    }
-
-
 }
+
+
+
