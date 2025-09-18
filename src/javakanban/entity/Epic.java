@@ -3,7 +3,7 @@ package javakanban.entity;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private ArrayList<Long> subtasksId;
+    private ArrayList<Long> subtasksId = new ArrayList<>();
 
     public ArrayList<Long> getSubtasksId() {
         return subtasksId;
@@ -18,18 +18,18 @@ public class Epic extends Task {
     }
 
     public Epic(String name, String description) {
-        super(name, description, Type.Epic);
-        this.subtasksId = new ArrayList<>();
+        super(name, description, TaskType.EPIC);
+        //this.subtasksId = new ArrayList<>();
 
     }
 
     public Epic(String name, String description, long id, Status status) {
-        super(name, description, id, status, Type.Epic);
+        super(name, description, id, status, TaskType.EPIC);
         this.subtasksId = new ArrayList<>();
     }
 
-    public Epic(Long id, Type type, String name, Status status, String description) {
-        super(id, type, name, status, description);
+    public Epic(Long id, TaskType taskType, String name, Status status, String description) {
+        super(id, taskType, name, status, description);
     }
 
 //    @Override

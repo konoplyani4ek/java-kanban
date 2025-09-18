@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 public class ManagersTest {
 
     @Test
-    void shouldReturnManagers(){
+    void shouldReturnManagers() {
         HistoryManager historyManager = new InMemoryHistoryManager();
-        TaskManager taskManager = Managers.getDefault(historyManager);
+        TaskManager taskManager = Managers.getDefault();
         Assertions.assertNotNull(historyManager);
         Assertions.assertNotNull(taskManager);
     }

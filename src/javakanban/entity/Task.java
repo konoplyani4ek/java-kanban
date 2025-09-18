@@ -8,12 +8,7 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
-    private Type type;
-
-    public Task() {
-
-    }
-
+    private TaskType taskType;
 
     @Override
     public boolean equals(Object object) { // в наследниках такой же
@@ -52,46 +47,67 @@ public class Task {
         return description;
     }
 
-    public Task(String name, String description, Type type) {
+    public TaskType getType() {
+        return taskType;
+    }
+
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
-        this.type = type;
-
+        this.taskType = TaskType.TASK;
     }
 
-    public Task(String name, String description, long id, Status status, Type type) {
+    public Task() {
+    }
+
+    public Task(String name, String description, Long id, Status status) {
+        this.name = name;
+        this.description = description;
+        this.status = Status.NEW;
+    }
+
+    public Task(String name, String description, TaskType taskType) {
+        this.name = name;
+        this.description = description;
+        this.taskType = taskType;
+        this.status = Status.NEW;
+    } // для создания эпиков и сабтасков
+
+    public Task(String name, String description, long id, Status status, TaskType taskType) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
-        this.type = type;
+        this.taskType = taskType;
 
     }
 
-    public Task(Long id, Type type, String name, Status status, String description) {
+    public Task(Long id, TaskType taskType, String name, Status status, String description) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
-        this.type = type;
+        this.taskType = taskType;
 
     }
 
     @Override
     public String toString() {
-        return id + "," +
-                type + "," +
-                name + "," +
-                status + "," +
-                description;
+        return String.format("%d,%s,%s,%s,%s",
+                id,
+                taskType,
+                name,
+                status,
+                description
+        );
     }
 
     public static Task fromString(String value) {
         String[] parts = value.split(",");
         Task task = new Task();
         task.id = Long.parseLong(parts[0]);
-        task.type = Type.valueOf(parts[1]);
+        task.taskType = TaskType.valueOf(parts[1]);
         task.name = parts[2];
         task.status = Status.valueOf(parts[3]);
         task.description = parts[4];

@@ -2,7 +2,6 @@ package javakanban.manager.history;
 
 import javakanban.entity.Node;
 import javakanban.entity.Task;
-import javakanban.entity.TaskLinkedList;
 
 import java.util.List;
 

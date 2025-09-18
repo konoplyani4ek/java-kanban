@@ -9,11 +9,11 @@ public class Main {
 
     public static void main(String[] args) { // можно удалять
         HistoryManager historyManager = new InMemoryHistoryManager();
-        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManager);
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
 
         System.out.println("задачи:");
-        Task task1 = new Task("Задача1", "Тема задачи 1", Type.Task);
-        Task task2 = new Task("Задача2", "Тема задачи 2",Type.Task);
+        Task task1 = new Task("Задача1", "Тема задачи 1");
+        Task task2 = new Task("Задача2", "Тема задачи 2");
         inMemoryTaskManager.putNewTask(task1);
         inMemoryTaskManager.putNewTask(task2);
         System.out.println(inMemoryTaskManager.getAllTasks());
