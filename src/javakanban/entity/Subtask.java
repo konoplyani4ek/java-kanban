@@ -39,6 +39,7 @@ public class Subtask extends Task {
                 "epicId=" + epicId +
                 '}';
     }
+
     @Override
     public String toStringCSV() {
         return String.format("%d,%s,%s,%s,%s,%s",

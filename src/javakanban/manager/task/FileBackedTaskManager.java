@@ -3,7 +3,6 @@ package javakanban.manager.task;
 import javakanban.entity.*;
 import javakanban.manager.CsvConverter;
 import javakanban.manager.ManagerSaveException;
-import javakanban.manager.history.HistoryManager;
 
 import java.io.*;
 
