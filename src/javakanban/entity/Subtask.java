@@ -2,20 +2,18 @@ package javakanban.entity;
 
 public class Subtask extends Task {
 
-    private final long epicId;
+    private final Long epicId;
 
-    public Subtask(String name, String description, long epicId) {
+    public Subtask(String name, String description, Long epicId) {
         super(name, description);
-        this.setTaskType(TaskType.SUBTASK);
         this.setStatus(Status.NEW);
         this.epicId = epicId;
     }
 
-    public Subtask(String name, String description, long id, Status status, long epicId) {
+    public Subtask(String name, String description, Long id, Status status, Long epicId) {
         super(name, description);
         this.setId(id);
         this.setStatus(status);
-        this.setTaskType(TaskType.SUBTASK);
         this.epicId = epicId;
     } // для апдейта
 
@@ -35,20 +33,14 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "Subtask{" +
-                "epicId=" + epicId +
+        return "Subtask {" +
+                "name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", id=" + getId() +
+                ", status=" + getStatus() +
+                ", taskType=" + getTaskType() +
+                ", epicId=" + getEpicId() +
                 '}';
     }
 
-    @Override
-    public String toStringCSV() {
-        return String.format("%d,%s,%s,%s,%s,%s",
-                getId(),
-                getTaskType(),
-                getName(),
-                getStatus(),
-                getDescription(),
-                getEpicId());
-
-    }
 }

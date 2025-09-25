@@ -11,8 +11,8 @@ public class SubTaskTest {
 
     @Test
     void equals_ReturnTrue_SameId() {
-        Subtask subtask1 = new Subtask("task1", "disc1", 3, Status.NEW, 2);
-        Subtask subtask2 = new Subtask("task2", "disc2", 3, Status.IN_PROGRESS, 2);
+        Subtask subtask1 = new Subtask("task1", "disc1", 3L, Status.NEW, 2L);
+        Subtask subtask2 = new Subtask("task2", "disc2", 3L, Status.IN_PROGRESS, 2L);
         assertEquals(subtask1.getId(), subtask2.getId());
         assertEquals(subtask1, subtask2);
     }

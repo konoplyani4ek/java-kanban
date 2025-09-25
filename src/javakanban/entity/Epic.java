@@ -14,7 +14,7 @@ public class Epic extends Task {
         subtasksId.clear();
     }
 
-    public void addSubtaskId(long id) {
+    public void addSubtaskId(Long id) {
         subtasksId.add(id);
     }
 
@@ -26,14 +26,12 @@ public class Epic extends Task {
     public Epic(String name, String description) {
         super(name, description);
         this.setStatus(Status.NEW);
-        this.setTaskType(TaskType.EPIC);
     }
 
-    public Epic(String name, String description, long id, Status status) {
+    public Epic(String name, String description, Long id, Status status) {
         super(name, description);
         this.setId(id);
         this.setStatus(status);
-        this.setTaskType(TaskType.EPIC);
     } // для апдейта
 
     public Epic(Long id, TaskType taskType, String name, Status status, String description) {
@@ -42,8 +40,12 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "subtasksId=" + subtasksId +
+        return "Epic {" +
+                "name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", id=" + getId() +
+                ", status=" + getStatus() +
+                ", taskType=" + getTaskType() +
                 '}';
     }
 

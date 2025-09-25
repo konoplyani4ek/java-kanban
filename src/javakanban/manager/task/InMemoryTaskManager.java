@@ -92,7 +92,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask putNewSubtask(Subtask subtask) {
         Epic epic = epicHashMap.get(subtask.getEpicId());
-        if (epic == null) { // long epic.id или subtask.id не могут быть null, хотя в Task они Long(не long)
+        if (epic == null) {
             throw new RuntimeException("Такой Subtask добавить нельзя ");
         } else {
             subtask.setId(generateNewId());

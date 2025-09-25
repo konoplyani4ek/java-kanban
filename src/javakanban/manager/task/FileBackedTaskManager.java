@@ -34,21 +34,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task getTaskById(long id) {
-        return super.getTaskById(id);
-    }
-
-    @Override
-    public Subtask getSubtaskById(long id) {
-        return super.getSubtaskById(id);
-    }
-
-    @Override
-    public Epic getEpicById(long id) {
-        return super.getEpicById(id);
-    }
-
-    @Override
     public Task putNewTask(Task task) {
         taskHashMap.put(task.getId(), task);
         save();
@@ -57,7 +42,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Subtask putNewSubtask(Subtask subtask) {
-        subtaskHashMap.put(subtask.getId(), subtask);
+        Epic epic = epicHashMap.get(subtask.getEpicId());
+        if (epic == null) {
+            throw new RuntimeException("Такой Subtask добавить нельзя ");
+        } else {
+            subtaskHashMap.put(subtask.getId(), subtask);
+            epic.addSubtaskId(subtask.getId());
+        }
         save();
         return subtask;
     }
@@ -113,13 +104,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (Writer writer = new FileWriter(file)) {
 
             for (Task task : getAllTasks()) {
-                writer.write(task.toStringCSV());
+                writer.write(CsvConverter.toStringCSV(task));
             }
             for (Epic epic : getAllEpics()) {
-                writer.write(epic.toStringCSV());
+                writer.write(CsvConverter.toStringCSV(epic));
             }
             for (Subtask subtask : getAllSubtasks()) {
-                writer.write(subtask.toStringCSV());
+                writer.write(CsvConverter.toStringCSV(subtask));
             }
         } catch (IOException exception) {
             throw new ManagerSaveException("ОШИБКА: данные не сохранены в файл");

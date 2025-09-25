@@ -8,7 +8,7 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
-    private TaskType taskType = TaskType.TASK;
+    private TaskType taskType;
 
     @Override
     public boolean equals(Object object) { // в наследниках такой же
@@ -23,7 +23,7 @@ public class Task {
         return Objects.hash(id);
     } // в наследниках такой же
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -47,12 +47,12 @@ public class Task {
         return description;
     }
 
-    public void setTaskType(TaskType taskType) {
+    public void setTaskType(TaskType taskType) { //вопрос: м.б. он должен быть приватным тк это служебный метод для других методов? (конструктор Epic, Subtask и тп)
         this.taskType = taskType;
     }
 
     public TaskType getTaskType() {
-        return taskType;
+        return TaskType.TASK;
     }
 
 
@@ -87,15 +87,7 @@ public class Task {
                 '}';
     }
 
-    public String toStringCSV() { // у Epic такой же
-        return String.format("%d,%s,%s,%s,%s",
-                getId(),
-                getTaskType(),
-                getName(),
-                getStatus(),
-                getDescription()
-        );
-    }
+
 }
 
 

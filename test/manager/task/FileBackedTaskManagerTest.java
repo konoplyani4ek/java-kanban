@@ -9,6 +9,9 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,50 +21,84 @@ public class FileBackedTaskManagerTest {
     File tempDir;
 
     @Test
-    void fromString_shouldReturnTask_whenTypeIsTask() {
-        String line = "1,TASK,Сходить в магазин,NEW,Купить молоко";
-
-        Task task = CsvConverter.fromString(line);
-
-        assertNotNull(task);
-        assertInstanceOf(Task.class, task);
-        assertEquals(1L, task.getId());
-        assertEquals(TaskType.TASK, task.getTaskType());
-        assertEquals("Сходить в магазин", task.getName());
-        assertEquals(Status.NEW, task.getStatus());
-        assertEquals("Купить молоко", task.getDescription());
-    }
-
-    @Test
     void loadFromFile_shouldLoadTasksCorrectly() throws IOException {
-        // Создаём временный файл
         File file = new File(tempDir, "tasks.csv");
-
-        //Пишем тестовые данные
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write("1,TASK,Сходить в магазин,NEW,Купить молоко\n");
-            writer.write("2,EPIC,Переезд,IN_PROGRESS,Собрать вещи\n");
-            writer.write("3,SUBTASK,Упаковать книги,DONE,В коробки,2\n");
-        }
-
-        // Загружаем менеджер
+        } // для создания пустого файла
         FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
+        manager.putNewTask(new Task(1L, TaskType.TASK, "написать код", Status.IN_PROGRESS, "методы ФЗ"));
+        manager.putNewEpic(new Epic(2L, TaskType.EPIC, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
+        manager.putNewSubtask(new Subtask(3L, TaskType.SUBTASK, "тест 1", Status.NEW, "тест save", 2L));
 
         assertNotNull(manager);
 
-        // Проверяем, что задачи добавлены
-        Task task = manager.getTaskById(1L);
+        Task task = manager.getTaskById(1);
         assertNotNull(task);
         assertEquals(TaskType.TASK, task.getTaskType());
-        assertEquals("Сходить в магазин", task.getName());
+        assertEquals("написать код", task.getName());
 
-        Epic epic = manager.getEpicById(2L);
+        Epic epic = manager.getEpicById(2);
         assertNotNull(epic);
-        assertEquals("Переезд", epic.getName());
+        assertEquals("написать тесты", epic.getName());
+        assertTrue(epic.getSubtasksId().contains(3L));
 
-        Subtask subtask = manager.getSubtaskById(3L);
+        Subtask subtask = manager.getSubtaskById(3);
         assertNotNull(subtask);
         assertEquals(2L, subtask.getEpicId());
-        assertEquals("Упаковать книги", subtask.getName());
+        assertEquals("тест 1", subtask.getName());
+    }
+
+    @Test
+    void putNewTask_FileNotEmpty() throws IOException {
+        File file = new File(tempDir, "tasks.csv");
+        try (FileWriter writer = new FileWriter(file)) {
+        } // для создания пустого файла
+        FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
+
+        manager.putNewTask(new Task(1L, TaskType.TASK, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
+        assertNotNull(manager.getTaskById(1));
+
+        Path filePath = file.toPath();
+        assertFalse(Files.size(filePath) == 0, "Файл пустой!");
+    }
+
+    @Test
+    void deleteTaskById_FileUpdated() throws IOException {
+        File file = new File(tempDir, "tasks.csv");
+        try (FileWriter writer = new FileWriter(file)) {
+        } // для создания пустого файла
+        FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
+
+        manager.putNewTask(new Task(1L, TaskType.TASK, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
+        manager.putNewTask(new Task(2L, TaskType.TASK, "проверить code-style", Status.IN_PROGRESS, "исправить форматирование"));
+
+        manager.deleteTaskById(1);
+
+        FileBackedTaskManager newManager = FileBackedTaskManager.loadFromFile(file);
+        assertFalse(newManager.getAllTasks().contains(1), "Задача  1 не удалена");
+        assertNotNull(newManager.getTaskById(2));
+
+        Task task = newManager.getTaskById(2);
+        assertEquals(TaskType.TASK, task.getTaskType());
+        assertEquals("проверить code-style", task.getName());
+        assertEquals(Status.IN_PROGRESS, task.getStatus());
+        assertEquals("исправить форматирование", task.getDescription());
+    }
+
+    @Test
+    void putThreeTasks_AllTasksAdded() throws IOException {
+        File file = new File(tempDir, "tasks.csv");
+        try (FileWriter writer = new FileWriter(file)) {
+        } // для создания пустого файла
+        FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
+
+        manager.putNewTask(new Task(1L, TaskType.TASK, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
+        manager.putNewTask(new Task(2L, TaskType.TASK, "проверить code-style", Status.IN_PROGRESS, "исправить форматирование"));
+
+        FileBackedTaskManager newManager = FileBackedTaskManager.loadFromFile(file);
+        newManager.putNewTask(new Task(3L, TaskType.TASK, "исправить ошибки", Status.IN_PROGRESS, "неверная логика"));
+
+
+        assertEquals(3, newManager.getAllTasks().size());
     }
 }

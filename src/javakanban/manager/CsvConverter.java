@@ -29,5 +29,34 @@ public class CsvConverter {
         }
     }
 
+    public static String toStringCSV(Task task) { //
+        return String.format("%d,%s,%s,%s,%s%n",
+                task.getId(),
+                task.getTaskType(),
+                task.getName(),
+                task.getStatus(),
+                task.getDescription()
+        );
+    }
 
+    public static String toStringCSV(Epic epic) {
+        return String.format("%d,%s,%s,%s,%s%n",
+                epic.getId(),
+                epic.getTaskType(),
+                epic.getName(),
+                epic.getStatus(),
+                epic.getDescription()
+        );
+    }
+
+    public static String toStringCSV(Subtask subtask) {
+        return String.format("%d,%s,%s,%s,%s,%s%n",
+                subtask.getId(),
+                subtask.getTaskType(),
+                subtask.getName(),
+                subtask.getStatus(),
+                subtask.getDescription(),
+                subtask.getEpicId());
+
+    }
 }
