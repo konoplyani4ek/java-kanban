@@ -33,11 +33,11 @@ public interface TaskManager {
 
     Epic putNewEpic(Epic epic);
 
-    Task updateTask(Long id, Task task);
+    Task updateTask(Task task);
 
-    Subtask updateSubtask(Long id, Subtask subtask);
+    Subtask updateSubtask(Subtask subtask);
 
-    Epic updateEpic(Long id, Epic epic);
+    Epic updateEpic(Epic epic);
 
     void deleteTaskById(long id);
 

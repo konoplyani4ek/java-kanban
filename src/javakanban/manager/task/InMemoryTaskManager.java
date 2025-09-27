@@ -111,21 +111,21 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task updateTask(Long id, Task task) {
+    public Task updateTask(Task task) {
+        Long id = task.getId();
         if (!taskHashMap.containsKey(id)) {
             throw new IllegalArgumentException("Task with id " + id + " not found.");
         }
-        task.setId(id);
         taskHashMap.put(id, task);
         return task;
     }
 
     @Override
-    public Subtask updateSubtask(Long id, Subtask subtask) {
+    public Subtask updateSubtask(Subtask subtask) {
+        Long id = subtask.getId();
         if (!subtaskHashMap.containsKey(id)) {
             throw new IllegalArgumentException("Subtask with id " + id + " not found.");
         }
-        subtask.setId(id);
         subtaskHashMap.put(id, subtask);
         Epic epic = getEpicById(subtask.getEpicId());
         updateEpicStatus(epic);
@@ -133,11 +133,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic updateEpic(Long id, Epic epic) {
+    public Epic updateEpic(Epic epic) {
+        Long id = epic.getId();
         if (!epicHashMap.containsKey(id)) {
             throw new IllegalArgumentException("Epic with id " + id + " not found.");
         }
-        epic.setId(id);
         epicHashMap.put(id, epic);
         return epic;
     }

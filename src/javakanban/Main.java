@@ -50,14 +50,14 @@ public class Main {
         System.out.println("стало " + inMemoryTaskManager.getAllTasks());
 
         System.out.println("\n изменить статус эпика через изменение статуса in Progress:");
-        inMemoryTaskManager.updateSubtask(5L, new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.IN_PROGRESS, 3L));
+        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.IN_PROGRESS, 3L));
 
         System.out.println(inMemoryTaskManager.getAllEpics());
         System.out.println(inMemoryTaskManager.getAllSubtasks());
 
         System.out.println("\n изменить статус эпика через изменение статуса подзадач Done:");
-        inMemoryTaskManager.updateSubtask(4L, new Subtask("подзадача 1 обновлена", "Тема подзадачи 1 обновлена", 4L, Status.DONE, 3L));
-        inMemoryTaskManager.updateSubtask(5L, new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.DONE, 3L));
+        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 1 обновлена", "Тема подзадачи 1 обновлена", 4L, Status.DONE, 3L));
+        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.DONE, 3L));
         System.out.println(inMemoryTaskManager.getAllSubtasks());
         System.out.println(inMemoryTaskManager.getAllEpics());
 

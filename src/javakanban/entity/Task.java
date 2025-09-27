@@ -8,7 +8,6 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
-    //private TaskType taskType;
 
     @Override
     public boolean equals(Object object) { // в наследниках такой же

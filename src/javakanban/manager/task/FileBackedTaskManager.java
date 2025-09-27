@@ -55,22 +55,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task updateTask(Long id, Task task) {
-        Task updatedTask = super.updateTask(id, task);
+    public Task updateTask(Task task) {
+        Task updatedTask = super.updateTask(task);
         save();
         return updatedTask;
     }
 
     @Override
-    public Subtask updateSubtask(Long id, Subtask subtask) {
-        Subtask updatedSubtask = super.updateSubtask(id, subtask);
+    public Subtask updateSubtask(Subtask subtask) {
+        Subtask updatedSubtask = super.updateSubtask(subtask);
         save();
         return updatedSubtask;
     }
 
     @Override
-    public Epic updateEpic(Long id, Epic epic) {
-        Epic updatedEpic = super.updateEpic(id, epic);
+    public Epic updateEpic(Epic epic) {
+        Epic updatedEpic = super.updateEpic(epic);
         save();
         return updatedEpic;
     }
@@ -142,20 +142,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                 }
             }
-
+            for (Subtask subtask : fileBackedTaskManager.subtaskHashMap.values()) {
+                Epic epic = fileBackedTaskManager.epicHashMap.get(subtask.getEpicId());
+                if (epic != null) {
+                    epic.getSubtasksId().add(subtask.getId());
+                } else {
+                    System.out.println("В файле сабтаск с несуществующим epicId: " + subtask.getEpicId());
+                }
+            }
         } catch (IOException exception) {
             throw new RuntimeException("Ошибка при загрузке данных из файла", exception);
         }
         fileBackedTaskManager.taskIdCounter = maxId + 1;
 
-        for (Subtask subtask : fileBackedTaskManager.subtaskHashMap.values()) {
-            Epic epic = fileBackedTaskManager.epicHashMap.get(subtask.getEpicId());
-            if (epic != null) {
-                epic.getSubtasksId().add(subtask.getId());
-            } else {
-                System.out.println("В файле сабтаск с несуществующим epicId: " + subtask.getEpicId());
-            }
-        }
+
         return fileBackedTaskManager;
     }
 
