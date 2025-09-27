@@ -34,8 +34,8 @@ public class Epic extends Task {
         this.setStatus(status);
     } // для апдейта
 
-    public Epic(Long id, TaskType taskType, String name, Status status, String description) {
-        super(id, taskType, name, status, description);
+    public Epic(Long id, String name, Status status, String description) {
+        super(id, name, status, description);
     } // этот конструктор нужен для inMemoryTaskManager
 
     @Override
@@ -45,7 +45,7 @@ public class Epic extends Task {
                 ", description='" + getDescription() + '\'' +
                 ", id=" + getId() +
                 ", status=" + getStatus() +
-                ", taskType=" + getTaskType() +
+                ", taskType=" + TaskType.EPIC +
                 '}';
     }
 

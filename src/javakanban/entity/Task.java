@@ -8,7 +8,7 @@ public class Task {
     private String description;
     private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
     private Status status;
-    private TaskType taskType;
+    //private TaskType taskType;
 
     @Override
     public boolean equals(Object object) { // в наследниках такой же
@@ -47,14 +47,9 @@ public class Task {
         return description;
     }
 
-    public void setTaskType(TaskType taskType) { //вопрос: м.б. он должен быть приватным тк это служебный метод для других методов? (конструктор Epic, Subtask и тп)
-        this.taskType = taskType;
-    }
-
     public TaskType getTaskType() {
         return TaskType.TASK;
     }
-
 
     public Task(String name, String description) {
         this.name = name;
@@ -68,12 +63,11 @@ public class Task {
         this.status = status;
     } // для апдейта
 
-    public Task(Long id, TaskType taskType, String name, Status status, String description) {
+    public Task(Long id, String name, Status status, String description) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
-        this.taskType = taskType;
     } // этот конструктор нужен для inMemoryTaskManager
 
     @Override
@@ -83,7 +77,7 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
-                ", taskType=" + taskType +
+                ", taskType=" + TaskType.TASK +
                 '}';
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private long taskIdCounter = 1;
+    protected long taskIdCounter = 1;
 
     protected final HashMap<Long, Task> taskHashMap = new HashMap<>();
     // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить

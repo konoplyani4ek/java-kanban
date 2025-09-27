@@ -26,9 +26,9 @@ public class FileBackedTaskManagerTest {
         try (FileWriter writer = new FileWriter(file)) {
         } // для создания пустого файла
         FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
-        manager.putNewTask(new Task(1L, TaskType.TASK, "написать код", Status.IN_PROGRESS, "методы ФЗ"));
-        manager.putNewEpic(new Epic(2L, TaskType.EPIC, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
-        manager.putNewSubtask(new Subtask(3L, TaskType.SUBTASK, "тест 1", Status.NEW, "тест save", 2L));
+        manager.putNewTask(new Task("написать код", "методы ФЗ"));
+        manager.putNewEpic(new Epic("написать тесты", "тест менеджера"));
+        manager.putNewSubtask(new Subtask("тест 1", "тест save", 2L));
 
         assertNotNull(manager);
 
@@ -55,7 +55,7 @@ public class FileBackedTaskManagerTest {
         } // для создания пустого файла
         FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
 
-        manager.putNewTask(new Task(1L, TaskType.TASK, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
+        manager.putNewTask(new Task("написать тесты", "тест менеджера"));
         assertNotNull(manager.getTaskById(1));
 
         Path filePath = file.toPath();
@@ -69,8 +69,8 @@ public class FileBackedTaskManagerTest {
         } // для создания пустого файла
         FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
 
-        manager.putNewTask(new Task(1L, TaskType.TASK, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
-        manager.putNewTask(new Task(2L, TaskType.TASK, "проверить code-style", Status.IN_PROGRESS, "исправить форматирование"));
+        manager.putNewTask(new Task("написать тесты", "тест менеджера"));
+        manager.putNewTask(new Task("проверить code-style", "исправить форматирование"));
 
         manager.deleteTaskById(1);
 
@@ -81,24 +81,42 @@ public class FileBackedTaskManagerTest {
         Task task = newManager.getTaskById(2);
         assertEquals(TaskType.TASK, task.getTaskType());
         assertEquals("проверить code-style", task.getName());
-        assertEquals(Status.IN_PROGRESS, task.getStatus());
+        assertEquals(Status.NEW, task.getStatus());
         assertEquals("исправить форматирование", task.getDescription());
     }
 
     @Test
-    void putThreeTasks_AllTasksAdded() throws IOException {
+    void putThreeTasks_ThreeTasksAdded() throws IOException {
         File file = new File(tempDir, "tasks.csv");
         try (FileWriter writer = new FileWriter(file)) {
         } // для создания пустого файла
         FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
 
-        manager.putNewTask(new Task(1L, TaskType.TASK, "написать тесты", Status.IN_PROGRESS, "тест менеджера"));
-        manager.putNewTask(new Task(2L, TaskType.TASK, "проверить code-style", Status.IN_PROGRESS, "исправить форматирование"));
+        manager.putNewTask(new Task("написать тесты", "тест менеджера"));
+        manager.putNewTask(new Task("проверить code-style", "исправить форматирование"));
 
         FileBackedTaskManager newManager = FileBackedTaskManager.loadFromFile(file);
-        newManager.putNewTask(new Task(3L, TaskType.TASK, "исправить ошибки", Status.IN_PROGRESS, "неверная логика"));
-
+        newManager.putNewTask(new Task("исправить ошибки", "неверная логика"));
 
         assertEquals(3, newManager.getAllTasks().size());
+    }
+
+    @Test
+    void putNewEpicAndSubtask_EpicHasSubtaskId() throws IOException {
+        File file = new File(tempDir, "tasks.csv");
+        try (FileWriter writer = new FileWriter(file)) {
+        }
+        FileBackedTaskManager manager = FileBackedTaskManager.loadFromFile(file);
+
+        Epic epic = new Epic("написать тесты", "тест менеджера");
+        assertNull(epic.getId());
+        manager.putNewEpic(epic);
+        assertEquals(1, epic.getId());
+
+        Subtask subtask = new Subtask("исправить ошибки", "неверная логика", 1L);
+        assertNull(subtask.getId());
+        manager.putNewSubtask(subtask);
+        assertEquals(2, subtask.getId());
+        assertTrue(epic.getSubtasksId().contains(2L));
     }
 }

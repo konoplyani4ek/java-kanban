@@ -15,15 +15,14 @@ public class CsvConverter {
         Status status = Status.valueOf(elements[3]);
         String description = elements[4];
 
-
         switch (taskType) {
             case TASK:
-                return new Task(id, taskType, name, status, description);
+                return new Task(id, name, status, description);
             case EPIC:
-                return new Epic(id, taskType, name, status, description);
+                return new Epic(id, name, status, description);
             case SUBTASK:
                 Long epicId = Long.parseLong(elements[5]);
-                return new Subtask(id, taskType, name, status, description, epicId);
+                return new Subtask(id, name, status, description, epicId);
             default:
                 throw new IllegalArgumentException("Unknown task type: " + taskType);
         }
@@ -35,8 +34,7 @@ public class CsvConverter {
                 task.getTaskType(),
                 task.getName(),
                 task.getStatus(),
-                task.getDescription()
-        );
+                task.getDescription());
     }
 
     public static String toStringCSV(Epic epic) {
@@ -45,8 +43,7 @@ public class CsvConverter {
                 epic.getTaskType(),
                 epic.getName(),
                 epic.getStatus(),
-                epic.getDescription()
-        );
+                epic.getDescription());
     }
 
     public static String toStringCSV(Subtask subtask) {
@@ -57,6 +54,5 @@ public class CsvConverter {
                 subtask.getStatus(),
                 subtask.getDescription(),
                 subtask.getEpicId());
-
     }
 }

@@ -17,8 +17,8 @@ public class Subtask extends Task {
         this.epicId = epicId;
     } // для апдейта
 
-    public Subtask(Long id, TaskType taskType, String name, Status status, String description, Long epicId) {
-        super(id, taskType, name, status, description);
+    public Subtask(Long id, String name, Status status, String description, Long epicId) {
+        super(id, name, status, description);
         this.epicId = epicId;
     } // этот конструктор нужен для inMemoryTaskManager
 
@@ -38,9 +38,8 @@ public class Subtask extends Task {
                 ", description='" + getDescription() + '\'' +
                 ", id=" + getId() +
                 ", status=" + getStatus() +
-                ", taskType=" + getTaskType() +
+                ", taskType=" + TaskType.SUBTASK +
                 ", epicId=" + getEpicId() +
                 '}';
     }
-
 }
