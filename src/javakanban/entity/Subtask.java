@@ -2,25 +2,44 @@ package javakanban.entity;
 
 public class Subtask extends Task {
 
-    private final long epicId;
+    private final Long epicId;
 
-    public Subtask(String name, String description, long epicId) {
+    public Subtask(String name, String description, Long epicId) {
         super(name, description);
+        this.setStatus(Status.NEW);
         this.epicId = epicId;
     }
 
-    public Subtask(String name, String description, long id, Status status, long epicId) { // для апдейта
-        super(name, description, id, status);
+    public Subtask(String name, String description, Long id, Status status, Long epicId) {
+        super(name, description);
+        this.setId(id);
+        this.setStatus(status);
         this.epicId = epicId;
-    }
+    } // для апдейта
+
+    public Subtask(Long id, String name, Status status, String description, Long epicId) {
+        super(id, name, status, description);
+        this.epicId = epicId;
+    } // этот конструктор нужен для inMemoryTaskManager
 
     public long getEpicId() {
         return epicId;
     }
 
     @Override
+    public TaskType getTaskType() {
+        return TaskType.SUBTASK;
+    }
+
+    @Override
     public String toString() {
-        return super.toString() +
-                " epic Id=" + epicId;
+        return "Subtask {" +
+                "name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", id=" + getId() +
+                ", status=" + getStatus() +
+                ", taskType=" + TaskType.SUBTASK +
+                ", epicId=" + getEpicId() +
+                '}';
     }
 }

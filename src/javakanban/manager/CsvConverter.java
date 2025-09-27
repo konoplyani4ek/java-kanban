@@ -1,0 +1,58 @@
+package javakanban.manager;
+
+import javakanban.entity.*;
+
+public class CsvConverter {
+
+    public static Task fromString(String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Пустая или null строка не может быть распарсена");
+        }
+        String[] elements = value.split(",");
+        Long id = Long.parseLong(elements[0]);
+        TaskType taskType = TaskType.valueOf(elements[1]);
+        String name = elements[2];
+        Status status = Status.valueOf(elements[3]);
+        String description = elements[4];
+
+        switch (taskType) {
+            case TASK:
+                return new Task(id, name, status, description);
+            case EPIC:
+                return new Epic(id, name, status, description);
+            case SUBTASK:
+                Long epicId = Long.parseLong(elements[5]);
+                return new Subtask(id, name, status, description, epicId);
+            default:
+                throw new IllegalArgumentException("Unknown task type: " + taskType);
+        }
+    }
+
+    public static String toStringCSV(Task task) { //
+        return String.format("%d,%s,%s,%s,%s%n",
+                task.getId(),
+                task.getTaskType(),
+                task.getName(),
+                task.getStatus(),
+                task.getDescription());
+    }
+
+    public static String toStringCSV(Epic epic) {
+        return String.format("%d,%s,%s,%s,%s%n",
+                epic.getId(),
+                epic.getTaskType(),
+                epic.getName(),
+                epic.getStatus(),
+                epic.getDescription());
+    }
+
+    public static String toStringCSV(Subtask subtask) {
+        return String.format("%d,%s,%s,%s,%s,%s%n",
+                subtask.getId(),
+                subtask.getTaskType(),
+                subtask.getName(),
+                subtask.getStatus(),
+                subtask.getDescription(),
+                subtask.getEpicId());
+    }
+}
