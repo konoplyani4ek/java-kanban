@@ -147,7 +147,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (epic != null) {
                     epic.getSubtasksId().add(subtask.getId());
                 } else {
-                    System.out.println("В файле сабтаск с несуществующим epicId: " + subtask.getEpicId());
+                    throw new RuntimeException("В файле сабтаск с несуществующим epicId: " + subtask.getEpicId());
                 }
             }
         } catch (IOException exception) {

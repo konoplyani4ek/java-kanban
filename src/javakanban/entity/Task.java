@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class Task {
 
-    private String name; // почему тогда и тут предлагает сделать final? ведь она тоже может быть изменена через методы?
-    private String description;
-    private Long id; // а тут final не предлагает, хотя мы подразумеваем что id не меняется?
+    private final String name; // final потому что не меняется напрямую, при создании Таска
+    private final String description;
+    private Long id; // есть setId, Таск создается без него
     private Status status;
 
     @Override
@@ -56,18 +56,12 @@ public class Task {
         this.status = Status.NEW;
     }
 
-    public Task(String name, String description, Status status) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
-    } // для апдейта
-
     public Task(Long id, String name, Status status, String description) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
-    } // этот конструктор нужен для inMemoryTaskManager
+    } // этот конструктор нужен для inMemoryTaskManager и апдейта
 
     @Override
     public String toString() {
@@ -79,8 +73,6 @@ public class Task {
                 ", taskType=" + TaskType.TASK +
                 '}';
     }
-
-
 }
 
 
