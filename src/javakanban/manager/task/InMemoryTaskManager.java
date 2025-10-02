@@ -4,6 +4,7 @@ import javakanban.entity.Epic;
 import javakanban.entity.Status;
 import javakanban.entity.Subtask;
 import javakanban.entity.Task;
+import javakanban.manager.Managers;
 import javakanban.manager.history.HistoryManager;
 
 import java.util.ArrayList;
@@ -13,19 +14,13 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private long taskIdCounter = 1;
+    protected long taskIdCounter = 1;
 
-    private final HashMap<Long, Task> taskHashMap; // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
-    private final HashMap<Long, Subtask> subtaskHashMap;
-    private final HashMap<Long, Epic> epicHashMap;
-    private final HistoryManager historyManager;
-
-    public InMemoryTaskManager(HistoryManager historyManager) {
-        this.taskHashMap = new HashMap<>();
-        this.subtaskHashMap = new HashMap<>();
-        this.epicHashMap = new HashMap<>();
-        this.historyManager = historyManager;
-    }
+    protected final HashMap<Long, Task> taskHashMap = new HashMap<>();
+    // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
+    protected final HashMap<Long, Subtask> subtaskHashMap = new HashMap<>();
+    protected final HashMap<Long, Epic> epicHashMap = new HashMap<>();
+    private final HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
     private long generateNewId() {
         return taskIdCounter++;
@@ -97,7 +92,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask putNewSubtask(Subtask subtask) {
         Epic epic = epicHashMap.get(subtask.getEpicId());
-        if (epic == null) { // long epic.id или subtask.id не могут быть null, хотя в Task они Long(не long)
+        if (epic == null) {
             throw new RuntimeException("Такой Subtask добавить нельзя ");
         } else {
             subtask.setId(generateNewId());
@@ -117,13 +112,21 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task updateTask(Task task) {
-        taskHashMap.put(task.getId(), task);
+        Long id = task.getId();
+        if (!taskHashMap.containsKey(id)) {
+            throw new IllegalArgumentException("Task with id " + id + " not found.");
+        }
+        taskHashMap.put(id, task);
         return task;
     }
 
     @Override
     public Subtask updateSubtask(Subtask subtask) {
-        subtaskHashMap.put(subtask.getId(), subtask);
+        Long id = subtask.getId();
+        if (!subtaskHashMap.containsKey(id)) {
+            throw new IllegalArgumentException("Subtask with id " + id + " not found.");
+        }
+        subtaskHashMap.put(id, subtask);
         Epic epic = getEpicById(subtask.getEpicId());
         updateEpicStatus(epic);
         return subtask;
@@ -131,7 +134,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic updateEpic(Epic epic) {
-        epicHashMap.put(epic.getId(), epic);
+        Long id = epic.getId();
+        if (!epicHashMap.containsKey(id)) {
+            throw new IllegalArgumentException("Epic with id " + id + " not found.");
+        }
+        epicHashMap.put(id, epic);
         return epic;
     }
 

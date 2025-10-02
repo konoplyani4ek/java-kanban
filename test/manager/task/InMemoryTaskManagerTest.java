@@ -30,7 +30,7 @@ public class InMemoryTaskManagerTest {
 
     @BeforeEach
     void initTaskManager() {
-        taskManager = new InMemoryTaskManager(new InMemoryHistoryManager());
+        taskManager = new InMemoryTaskManager();
 
     }
 
@@ -118,9 +118,9 @@ public class InMemoryTaskManagerTest {
 
     @Test
     void updateTask_changeNameValue() {
-        Task task1 = taskManager.putNewTask(buildTask());
-        Task updateTask1 = new Task("НоваяЗадача1", "Описание задачи1",
-                task1.getId(), Status.NEW);
+        Task task1 = taskManager.putNewTask(buildTask()); // id = 1
+        Task updateTask1 = new Task(1L, "НоваяЗадача1", Status.NEW, "Описание задачи1");
+        System.out.println(taskManager.getAllTasks());
         taskManager.updateTask(updateTask1);
         assertEquals("НоваяЗадача1", taskManager.getTaskById(1).getName());
     }
@@ -129,8 +129,7 @@ public class InMemoryTaskManagerTest {
     void updateTask_changeStatus() {
         Task task1 = taskManager.putNewTask(buildTask());
         assertEquals(Status.NEW, task1.getStatus());
-        Task updateTask1 = new Task("НоваяЗадача1", "Описание задачи1",
-                task1.getId(), Status.IN_PROGRESS);
+        Task updateTask1 = new Task(1L, "НоваяЗадача1", Status.IN_PROGRESS, "Описание задачи1");
         taskManager.updateTask(updateTask1);
         assertEquals(Status.IN_PROGRESS, taskManager.getTaskById(1).getStatus());
     }
@@ -220,7 +219,8 @@ public class InMemoryTaskManagerTest {
         assertTrue(taskManager.getHistory().contains(subtask));
     }
 
-    @Test //новый тест
+    @Test
+        //новый тест
     void getHistory_addToHistory_whenGetSameTask() {
         Task task1 = taskManager.putNewTask(buildTask());
         Task task2 = taskManager.putNewTask(buildTask());
@@ -242,11 +242,12 @@ public class InMemoryTaskManagerTest {
         assertNotEquals(epic.getId(), subtask.getId());
     }
 
-    @Test // новый тест
-    void deleteSubtaskById_EpicSubtaskListIsEmpty_whenDeleteSubtask(){
+    @Test
+        // новый тест
+    void deleteSubtaskById_EpicSubtaskListIsEmpty_whenDeleteSubtask() {
         Epic epic = taskManager.putNewEpic(buildEpic());//id 1
         Subtask subtask = taskManager.putNewSubtask(buildSubtask(epic)); // id 2
         taskManager.deleteSubtaskById(2);
-        assertEquals(0, epic.getSubtasksId().size() );
+        assertEquals(0, epic.getSubtasksId().size());
     }
 }

@@ -1,4 +1,7 @@
-package javakanban.entity;
+package javakanban.manager.history;
+
+import javakanban.entity.Node;
+import javakanban.entity.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -3,7 +3,8 @@ package javakanban.entity;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private ArrayList<Long> subtasksId;
+
+    private final ArrayList<Long> subtasksId = new ArrayList<>();
 
     public ArrayList<Long> getSubtasksId() {
         return subtasksId;
@@ -13,24 +14,39 @@ public class Epic extends Task {
         subtasksId.clear();
     }
 
-    public void addSubtaskId(long id) {
+    public void addSubtaskId(Long id) {
         subtasksId.add(id);
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.EPIC;
     }
 
     public Epic(String name, String description) {
         super(name, description);
-        this.subtasksId = new ArrayList<>();
+        this.setStatus(Status.NEW);
     }
 
-    public Epic(String name, String description, long id, Status status) {
-        super(name, description, id, status);
-        this.subtasksId = new ArrayList<>();
-    }
+    public Epic(String name, String description, Long id, Status status) {
+        super(name, description);
+        this.setId(id);
+        this.setStatus(status);
+    } // для апдейта
 
+    public Epic(Long id, String name, Status status, String description) {
+        super(id, name, status, description);
+    } // этот конструктор нужен для inMemoryTaskManager
 
     @Override
     public String toString() {
-        return super.toString() +
-                " subtasksId=" + subtasksId;
+        return "Epic {" +
+                "name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", id=" + getId() +
+                ", status=" + getStatus() +
+                ", taskType=" + TaskType.EPIC +
+                '}';
     }
+
 }

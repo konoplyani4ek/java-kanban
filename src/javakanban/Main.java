@@ -1,9 +1,6 @@
 package javakanban;
 
-import javakanban.entity.Epic;
-import javakanban.entity.Status;
-import javakanban.entity.Subtask;
-import javakanban.entity.Task;
+import javakanban.entity.*;
 import javakanban.manager.history.HistoryManager;
 import javakanban.manager.history.InMemoryHistoryManager;
 import javakanban.manager.task.InMemoryTaskManager;
@@ -12,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) { // можно удалять
         HistoryManager historyManager = new InMemoryHistoryManager();
-        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManager);
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
 
         System.out.println("задачи:");
         Task task1 = new Task("Задача1", "Тема задачи 1");
@@ -53,14 +50,14 @@ public class Main {
         System.out.println("стало " + inMemoryTaskManager.getAllTasks());
 
         System.out.println("\n изменить статус эпика через изменение статуса in Progress:");
-        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5, Status.IN_PROGRESS, 3));
+        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.IN_PROGRESS, 3L));
 
         System.out.println(inMemoryTaskManager.getAllEpics());
         System.out.println(inMemoryTaskManager.getAllSubtasks());
 
         System.out.println("\n изменить статус эпика через изменение статуса подзадач Done:");
-        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 1 обновлена", "Тема подзадачи 1 обновлена", 4, Status.DONE, 3));
-        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5, Status.DONE, 3));
+        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 1 обновлена", "Тема подзадачи 1 обновлена", 4L, Status.DONE, 3L));
+        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.DONE, 3L));
         System.out.println(inMemoryTaskManager.getAllSubtasks());
         System.out.println(inMemoryTaskManager.getAllEpics());
 
@@ -81,7 +78,7 @@ public class Main {
         System.out.println("стало  " + inMemoryTaskManager.getAllEpics());
 
         System.out.println("\n пробую создать задачу с несуществующим epicId");
-        inMemoryTaskManager.putNewSubtask(new Subtask("подзадача 3", "тема 3", 9));
+        inMemoryTaskManager.putNewSubtask(new Subtask("подзадача 3", "тема 3", 9L));
 
 
     }

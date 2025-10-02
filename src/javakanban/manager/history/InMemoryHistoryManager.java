@@ -2,16 +2,12 @@ package javakanban.manager.history;
 
 import javakanban.entity.Node;
 import javakanban.entity.Task;
-import javakanban.entity.TaskLinkedList;
 
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    // убираю лист тут и меняю на кастомный лист
     private final TaskLinkedList historyList; // final потому что не будем перезаписывать ссылку на другой объект или null, но внутри можно изменить
-    // private static final int HISTORY_LIST_MAX_SIZE = 10;
-
 
     @Override
     public void add(Task task) {
@@ -24,8 +20,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(long id) {
-        Node node = historyList.getNodeMap().get(id); // мне кажется уместным сделать Node внутренним классом у TaskLinkedList, но тогда
-        if (node != null) {                           // надо переписать этот метод без инициализации ноды, так?
+        Node node = historyList.getNodeMap().get(id);
+        if (node != null) {
             historyList.removeNode(node);
         }
     }
