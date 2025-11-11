@@ -10,6 +10,7 @@ import java.util.List;
 public interface TaskManager {
 
     ArrayList<Task> getAllTasks();
+    List<Task> getPrioritizedTasks();
 
     ArrayList<Subtask> getAllSubtasks();
 

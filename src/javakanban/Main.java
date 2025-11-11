@@ -5,6 +5,9 @@ import javakanban.manager.history.HistoryManager;
 import javakanban.manager.history.InMemoryHistoryManager;
 import javakanban.manager.task.InMemoryTaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Main {
 
     public static void main(String[] args) { // можно удалять
@@ -50,14 +53,17 @@ public class Main {
         System.out.println("стало " + inMemoryTaskManager.getAllTasks());
 
         System.out.println("\n изменить статус эпика через изменение статуса in Progress:");
-        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.IN_PROGRESS, 3L));
+        inMemoryTaskManager.updateSubtask(new Subtask(5L, "подзадача 2 обновлена", Status.IN_PROGRESS, "Тема подзадачи 2 обновлена", Duration.ofMinutes(60), LocalDateTime
+                .now(), 3L));
 
         System.out.println(inMemoryTaskManager.getAllEpics());
         System.out.println(inMemoryTaskManager.getAllSubtasks());
 
         System.out.println("\n изменить статус эпика через изменение статуса подзадач Done:");
-        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 1 обновлена", "Тема подзадачи 1 обновлена", 4L, Status.DONE, 3L));
-        inMemoryTaskManager.updateSubtask(new Subtask("подзадача 2 обновлена", "Тема подзадачи 2 обновлена", 5L, Status.DONE, 3L));
+        inMemoryTaskManager.updateSubtask(new Subtask(4L, "подзадача 2 обновлена", Status.IN_PROGRESS, "Тема подзадачи 2 обновлена", Duration.ofMinutes(60), LocalDateTime
+                .now(), 3L));
+        inMemoryTaskManager.updateSubtask(new Subtask(5L, "подзадача 2 обновлена", Status.IN_PROGRESS, "Тема подзадачи 2 обновлена", Duration.ofMinutes(60), LocalDateTime
+                .now(), 3L));
         System.out.println(inMemoryTaskManager.getAllSubtasks());
         System.out.println(inMemoryTaskManager.getAllEpics());
 
