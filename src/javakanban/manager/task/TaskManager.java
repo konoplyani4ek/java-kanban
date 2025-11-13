@@ -10,6 +10,7 @@ import java.util.List;
 public interface TaskManager {
 
     ArrayList<Task> getAllTasks();
+
     List<Task> getPrioritizedTasks();
 
     ArrayList<Subtask> getAllSubtasks();
@@ -46,7 +47,7 @@ public interface TaskManager {
 
     void deleteEpicById(long id);
 
-    ArrayList<Subtask> getSubtasksByEpic(Epic epic);
+    List<Subtask> getSubtasksByEpic(Epic epic);
 
     List<Task> getHistory();
 }

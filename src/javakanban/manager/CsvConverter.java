@@ -12,7 +12,7 @@ public class CsvConverter {
             throw new IllegalArgumentException("Пустая или null строка не может быть распарсена");
         }
 
-        String[] elements = value.split(",",-1);
+        String[] elements = value.split(",", -1);
 
         Long id = elements[0].isBlank() ? null : Long.parseLong(elements[0]);
         TaskType taskType = TaskType.valueOf(elements[1]);
@@ -22,27 +22,21 @@ public class CsvConverter {
         Duration duration = elements[5].isBlank() ? null : Duration.ofMinutes(Long.parseLong(elements[5]));
         LocalDateTime startTime = elements[6].isBlank() ? null : LocalDateTime.parse(elements[6]);
 
-        switch (taskType) {
-            case TASK:
-                return new Task(id, name, status, description, duration, startTime);
-
-            case EPIC:
-                // элементы [7] — endTime, может быть пустым
+        return switch (taskType) {
+            case TASK -> new Task(id, name, status, description, duration, startTime);
+            case EPIC -> {
                 LocalDateTime endTime = (elements.length > 7 && !elements[7].isBlank())
                         ? LocalDateTime.parse(elements[7])
-                        : null;
-                return new Epic(id, name, status, description, duration, startTime, endTime);
-
-            case SUBTASK:
-                // элементы [7] — epicId, может быть пустым
+                        : null;// может быть пустым
+                yield new Epic(id, name, status, description, duration, startTime, endTime);
+            }
+            case SUBTASK -> {
                 Long epicId = (elements.length > 7 && !elements[7].isBlank())
                         ? Long.parseLong(elements[7])
-                        : null;
-                return new Subtask(id, name, status, description, duration, startTime, epicId);
-
-            default:
-                throw new IllegalArgumentException("Unknown task type: " + taskType);
-        }
+                        : null; //  может быть пустым
+                yield new Subtask(id, name, status, description, duration, startTime, epicId);
+            }
+        };
     }
 
     public static String toStringCSV(Task task) {

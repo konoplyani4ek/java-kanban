@@ -45,7 +45,10 @@ public class InMemoryTaskManagerTest {
     @Test
     void putNewTask_taskHashMapHasElements() {
         Task task1 = taskManager.putNewTask(buildTask());
-        Task task2 = taskManager.putNewTask(buildTask());
+        Task task2 = buildTask();
+        task2.setStartTime(task1.getStartTime().plusHours(2));
+        task2.setDuration(Duration.ofHours(3));
+        taskManager.putNewTask(task2);
         assertEquals(2, taskManager.getAllTasks().size());
     }
 
@@ -75,7 +78,10 @@ public class InMemoryTaskManagerTest {
     @Test
     void clearAllTasks_mapIsEmpty_deleteTasks() {
         Task task1 = taskManager.putNewTask(buildTask());
-        Task task2 = taskManager.putNewTask(buildTask());
+        Task task2 = buildTask();
+        task2.setStartTime(task1.getStartTime().plusHours(2));
+        task2.setDuration(Duration.ofHours(3));
+        taskManager.putNewTask(task2);
         taskManager.clearAllTasks();
         assertEquals(0, taskManager.getAllTasks().size());
     }
@@ -92,7 +98,9 @@ public class InMemoryTaskManagerTest {
     void clearAllSubtasks_mapIsEmpty_deleteEpics() {
         Epic epic = taskManager.putNewEpic(buildEpic());
         Subtask subtask1 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic));
-        Subtask subtask2 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic));
+        Subtask subtask2 = buildSubtaskWithTemporalParams(epic);
+        subtask2.setStartTime(subtask1.getStartTime().plusHours(2));
+        subtask2.setDuration(Duration.ofHours(3));
         taskManager.clearAllEpics();
         assertEquals(0, taskManager.getAllEpics().size());
         assertEquals(0, taskManager.getAllSubtasks().size());
@@ -102,7 +110,9 @@ public class InMemoryTaskManagerTest {
     void clearAllSubtasks_mapIsEmpty_deleteSubtasks() {
         Epic epic = taskManager.putNewEpic(buildEpic());
         Subtask subtask1 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic));
-        Subtask subtask2 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic));
+        Subtask subtask2 = buildSubtaskWithTemporalParams(epic);
+        subtask2.setStartTime(subtask1.getStartTime().plusHours(2));
+        subtask2.setDuration(Duration.ofHours(3));
         taskManager.clearAllSubtasks();
         assertEquals(0, taskManager.getAllSubtasks().size());
     }
@@ -166,9 +176,12 @@ public class InMemoryTaskManagerTest {
     void updateSubtask_changeEpicStatusToDone_allSubtasksStatusDone() {
         Epic epic = taskManager.putNewEpic(buildEpic());
         Subtask subtask1 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic));
-        Subtask subtask2 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic));
+        Subtask subtask2 = buildSubtaskWithTemporalParams(epic);
+        subtask2.setStartTime(subtask1.getStartTime().plusHours(2));
+        subtask2.setDuration(Duration.ofHours(3));
+        taskManager.putNewSubtask(subtask2);
         taskManager.updateSubtask(new Subtask(subtask1.getId(), "subtask1", Status.DONE, "subtask1disc", Duration.ofMinutes(60), LocalDateTime.now(), epic.getId()));
-        taskManager.updateSubtask(new Subtask(subtask2.getId(), "subtask2", Status.DONE, "subtask2disc", Duration.ofMinutes(60), LocalDateTime.now(), epic.getId()));
+        taskManager.updateSubtask(new Subtask(subtask2.getId(), "subtask2", Status.DONE, "subtask2disc", Duration.ofHours(3), subtask1.getStartTime().plusHours(2), epic.getId()));
         assertEquals(Status.DONE, taskManager.getSubtaskById(2).getStatus());
         assertEquals(Status.DONE, taskManager.getSubtaskById(3).getStatus());
         assertEquals(Status.DONE, taskManager.getEpicById(1).getStatus());
@@ -177,7 +190,10 @@ public class InMemoryTaskManagerTest {
     @Test
     void putNewTask_UniqueTasks() {
         Task task1 = taskManager.putNewTask(buildTask());
-        Task task2 = taskManager.putNewTask(buildTask());
+        Task task2 = buildTask();
+        task2.setStartTime(task1.getStartTime().plusHours(2));
+        task2.setDuration(Duration.ofHours(3));
+        taskManager.putNewTask(task2);
         assertNotEquals(task1, task2);
         ArrayList<Task> tasks = taskManager.getAllTasks();
         assertTrue(tasks.contains(task1));
@@ -338,15 +354,13 @@ public class InMemoryTaskManagerTest {
 
     @Test
     void putNewTask_shouldThrowException_whenTasksIntersect() {
-        // Добавляем первую задачу
         Task task1 = buildTask();
         task1.setStartTime(LocalDateTime.of(2025, 11, 11, 10, 0));
         taskManager.putNewTask(task1);
 
-        //  пересекается по времени с первой
         Task task2 = buildTask();
         task2.setStartTime(LocalDateTime.of(2025, 11, 11, 10, 30));
-        // Проверяем, что выбрасывается исключение
+
         assertThrows(IllegalStateException.class, () -> {
             taskManager.putNewTask(task2);
         }, "Нельзя добавить. Таск пересекается с другим по времени");
