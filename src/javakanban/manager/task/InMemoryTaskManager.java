@@ -10,8 +10,6 @@ import javakanban.manager.history.HistoryManager;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -100,13 +98,12 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epicHashMap.get(subtask.getEpicId());
         if (epic == null) {
             throw new RuntimeException("Такой Subtask добавить нельзя ");
-        } else {
-            subtask.setId(generateNewId());
-            subtaskHashMap.put(subtask.getId(), subtask);
-            epic.addSubtaskId(subtask.getId());
-            updateEpicFields(epic);
-            addToPrioritized(subtask);
         }
+        subtask.setId(generateNewId());
+        subtaskHashMap.put(subtask.getId(), subtask);
+        epic.addSubtaskId(subtask.getId());
+        updateEpicFields(epic);
+        addToPrioritized(subtask);
         return subtask;
     }
 
@@ -136,6 +133,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subtaskHashMap.containsKey(id)) {
             throw new IllegalArgumentException("Subtask with id " + id + " not found.");
         }
+        checkIfIntersects(subtask);
+        removeFromPrioritized(subtaskHashMap.get(id));
         subtaskHashMap.put(id, subtask);
         Epic epic = getEpicById(subtask.getEpicId());
         updateEpicFields(epic);
