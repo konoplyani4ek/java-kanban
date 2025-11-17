@@ -1,28 +1,22 @@
 package javakanban.entity;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
 
     private final Long epicId;
-
+    //конструктор с новыми полями не нужен
     public Subtask(String name, String description, Long epicId) {
         super(name, description);
-        this.setStatus(Status.NEW);
         this.epicId = epicId;
     }
 
-    public Subtask(String name, String description, Long id, Status status, Long epicId) {
-        super(name, description);
-        this.setId(id);
-        this.setStatus(status);
+    public Subtask(Long id, String name, Status status, String description, Duration duration, LocalDateTime startTime, Long epicId){
+        super(id, name, status, description, duration, startTime);
         this.epicId = epicId;
-    } // для апдейта
-
-    public Subtask(Long id, String name, Status status, String description, Long epicId) {
-        super(id, name, status, description);
-        this.epicId = epicId;
-    } // этот конструктор нужен для inMemoryTaskManager
-
-    public long getEpicId() {
+    } // этот конструктор нужен для FileBackedTaskManager и апдейта, новые поля null
+    public Long getEpicId() {
         return epicId;
     }
 
@@ -40,6 +34,8 @@ public class Subtask extends Task {
                 ", status=" + getStatus() +
                 ", taskType=" + TaskType.SUBTASK +
                 ", epicId=" + getEpicId() +
+                ", duration=" + getDuration() +
+                ", startTime=" + getStartTime() +
                 '}';
     }
 }
