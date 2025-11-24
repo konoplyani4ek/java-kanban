@@ -170,6 +170,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteEpicById(long id) {
+        Epic epic = epicHashMap.get(id);
+        if (epic == null) {
+            return; // чтобы вернул 404 а не 500
+        }
         ArrayList<Long> subtasksToDelete = epicHashMap.get(id).getSubtasksId();
         for (Long subtaskId : subtasksToDelete) {
             subtaskHashMap.remove(subtaskId);
