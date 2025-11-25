@@ -6,7 +6,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import javakanban.entity.Task;
 import javakanban.manager.task.TaskManager;
-import server.HttpTaskServer;
 import server.adapter.Adapters;
 
 
@@ -47,7 +46,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
                 break;
 
             default:
-                new HttpTaskServer.UnknownPathHandler().handle(exchange);
+                new BaseHttpHandler.UnknownPathHandler().handle(exchange);
         }
     }
 }

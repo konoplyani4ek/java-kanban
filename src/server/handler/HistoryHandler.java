@@ -4,13 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-
 import javakanban.entity.Task;
 import javakanban.manager.task.TaskManager;
-import server.HttpTaskServer;
 import server.adapter.Adapters;
-
-
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -48,7 +44,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
                 break;
 
             default:
-                new HttpTaskServer.UnknownPathHandler().handle(exchange);
+                new BaseHttpHandler.UnknownPathHandler().handle(exchange);
         }
     }
 }

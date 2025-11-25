@@ -34,6 +34,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     public InMemoryHistoryManager() {
         this.historyList = new TaskLinkedList();
     }
+
+
 }
 
 

@@ -50,7 +50,7 @@ public class HistoryHandlerTest {
         Task task1 = new Task("Задача 1", "Описание 1");
         Task task2 = new Task("Задача 2", "Описание 2");
         taskManager.putNewTask(task1);
-         taskManager.putNewTask(task2);
+        taskManager.putNewTask(task2);
 
         taskManager.getTaskById(1);
         taskManager.getTaskById(2);

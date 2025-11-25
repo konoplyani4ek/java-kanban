@@ -1,6 +1,6 @@
 package server.handler;
 
-import com.google.gson.Gson;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import javakanban.entity.Epic;
@@ -8,77 +8,49 @@ import javakanban.entity.Subtask;
 import javakanban.exception.ManagerSaveException;
 import javakanban.exception.NotFoundException;
 import javakanban.manager.task.TaskManager;
-import server.HttpTaskServer;
-
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson;
     private String requestBody;
 
     public SubtaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = HttpTaskServer.getGson();
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
-        requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+
+        // тело запроса только для POST/PUT/PATCH
+        requestBody = switch (method) {
+            case "POST", "PUT", "PATCH" -> new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            default -> "";
+        };
+
         Endpoint endpoint = Endpoint.endpointFromMethodAndPath(method, path);
 
-        switch (endpoint) {
-            case GET_SUBTASKS:
-                List<Subtask> subtasks = taskManager.getAllSubtasks();
-                if (subtasks.isEmpty()) {
-                    sendIfEmptyList(exchange);
-                    return;
-                }
-                sendText(exchange, gson.toJson(subtasks), 200);
-                break;
+        try {
+            switch (method) {
+                case "GET" -> handleGet(exchange, endpoint, path);
+                case "POST" -> handlePost(exchange, endpoint);
+                case "DELETE" -> handleDelete(exchange, endpoint, path);
+                default -> new BaseHttpHandler.UnknownPathHandler().handle(exchange);
+            }
 
-            case GET_SUBTASK_BY_ID:
-                try {
-                    int idForGet = extractIdFromPath(path);
-                    Subtask subtask = taskManager.getSubtaskById(idForGet);
-                    if (subtask == null) {
-                        sendNotFound(exchange);
-                        return;
-                    }
-                    sendText(exchange, gson.toJson(subtask), 200);
-                } catch (NotFoundException e) {
-                    sendText(exchange, e.getMessage(), 404);
-                } catch (IllegalArgumentException e) {
-                    sendText(exchange, "Ошибка: неверный путь или идентификатор", 400);
-                }
-                break;
+        } catch (NotFoundException e) {
+            sendText(exchange, e.getMessage(), 404);
 
-            case CREATE_OR_UPDATE_SUBTASK:
-                createOrUpdateSubtask(exchange);
-                break;
+        } catch (IllegalArgumentException e) {
+            sendText(exchange, "Ошибка: неверный путь или идентификатор", 400);
 
-            case DELETE_SUBTASK:
-                try {
-                    int idForDelete = extractIdFromPath(path);
-                    if (taskManager.getSubtaskById(idForDelete) == null) {
-                        sendNotFound(exchange);
-                        return;
-                    }
-                    taskManager.deleteSubtaskById(idForDelete);
-                    sendText(exchange, "Подзадача с Id: " + idForDelete + " успешно удалена", 204);
-
-                } catch (NotFoundException e) {
-                    sendText(exchange, e.getMessage(), 404);
-                }
-            default:
-                new HttpTaskServer.UnknownPathHandler().handle(exchange);
+        } catch (Exception e) {
+            sendText(exchange, "Ошибка сервера: " + e.getMessage(), 500);
         }
     }
+
 
     private void createOrUpdateSubtask(HttpExchange exchange) throws IOException {
         try {
@@ -92,66 +64,85 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
             Long id = incoming.getId();
             Long epicId = incoming.getEpicId();
 
-            // --- Проверяем корректность Id эпика ---
+            // === Проверяем корректность Id эпика ===
             Epic parentEpic = taskManager.getEpicById(epicId);
             if (parentEpic == null) {
                 sendText(exchange, "Ошибка: указан несуществующий Id эпика", 400);
                 return;
             }
 
-            // --- Создание новой подзадачи ---
-            if (id == null || id == 0 || id == -1) {
-                Subtask newSubtask = new Subtask(
-                        incoming.getId(),
-                        incoming.getName(),
-                        incoming.getStatus(),
-                        incoming.getDescription(),
-                        incoming.getDuration(),
-                        incoming.getStartTime(),
-                        incoming.getEpicId()
-                );
-
-                taskManager.putNewSubtask(newSubtask);
+            // === Создание новой подзадачи ===
+            if (id == null || id <= 0) {
+                Subtask newSubtask = taskManager.putNewSubtask(incoming);
                 sendText(exchange, "Подзадача создана с Id: " + newSubtask.getId(), 201);
                 return;
             }
 
-            // --- Обновление подзадачи ---
-            Subtask existing = taskManager.getSubtaskById(id);
-            if (existing == null) {
-                sendNotFound(exchange);
-                return;
-            }
+            // === Обновление подзадачи ===
+            Subtask updated = taskManager.updateSubtask(incoming);
+            sendText(exchange, "Подзадача с Id: " + updated.getId() + " успешно обновлена", 200);
 
-            // Создаём immutable-объект Subtask
-            Subtask updated = new Subtask(
-                    incoming.getId(),
-                    incoming.getName(),
-                    incoming.getStatus(),
-                    incoming.getDescription(),
-                    incoming.getDuration(),
-                    incoming.getStartTime(),
-                    incoming.getEpicId()
-            );
-
-            taskManager.updateSubtask(updated);
-            sendText(exchange, "Подзадача с Id: " + id + " успешно обновлена", 200);
+        } catch (NotFoundException e) {
+            sendText(exchange, e.getMessage(), 404);
 
         } catch (ManagerSaveException e) {
             sendHasInteractions(exchange);
+
         } catch (Exception e) {
             sendText(exchange, "Ошибка: некорректный JSON или данные подзадачи", 400);
         }
     }
 
-    private int extractIdFromPath(String path) {
-        String[] pathParts = path.split("/");
+    private void handleGet(HttpExchange exchange, Endpoint endpoint, String path) throws IOException {
+        switch (endpoint) {
 
-        if (pathParts.length >= 3 && "subtasks".equals(pathParts[1])) {
-            return Integer.parseInt(pathParts[2]);
+            case GET_SUBTASKS -> {
+                sendText(exchange, gson.toJson(taskManager.getAllSubtasks()), 200);
+            }
+
+            case GET_SUBTASK_BY_ID -> {
+                int id = extractIdFromPath(path);
+                Subtask subtask = taskManager.getSubtaskById(id);
+
+                if (subtask == null) {
+                    sendNotFound(exchange);
+                    return;
+                }
+
+                sendText(exchange, gson.toJson(subtask), 200);
+            }
+
+            default -> new BaseHttpHandler.UnknownPathHandler().handle(exchange);
         }
+    }
 
-        throw new IllegalArgumentException("Неверный путь, идентификатор не найден");
+    private void handlePost(HttpExchange exchange, Endpoint endpoint) throws IOException {
+        switch (endpoint) {
+
+            case CREATE_OR_UPDATE_SUBTASK -> {
+                createOrUpdateSubtask(exchange);
+            }
+
+            default -> new BaseHttpHandler.UnknownPathHandler().handle(exchange);
+        }
+    }
+
+    private void handleDelete(HttpExchange exchange, Endpoint endpoint, String path) throws IOException {
+        switch (endpoint) {
+
+            case DELETE_SUBTASK -> {
+                int id = extractIdFromPath(path);
+                if (taskManager.getSubtaskById(id) == null) {
+                    sendNotFound(exchange);
+                    return;
+                }
+
+                taskManager.deleteSubtaskById(id);
+                sendText(exchange, "Подзадача с Id: " + id + " успешно удалена", 204);
+            }
+
+            default -> new BaseHttpHandler.UnknownPathHandler().handle(exchange);
+        }
     }
 }
 

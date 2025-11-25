@@ -34,7 +34,6 @@ public enum Endpoint {
         if (path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
         }
-
         for (Endpoint endpoint : Endpoint.values()) {
             String regex = endpoint.path.replace("{id}", "\\d+");
 
@@ -43,7 +42,6 @@ public enum Endpoint {
                 return endpoint;
             }
         }
-
         return Endpoint.UNKNOWN;
     }
 }

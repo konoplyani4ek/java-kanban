@@ -1,85 +1,61 @@
 package server.handler;
 
-import com.google.gson.Gson;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import javakanban.entity.Task;
 import javakanban.exception.ManagerSaveException;
 import javakanban.exception.NotFoundException;
 import javakanban.manager.task.TaskManager;
-import server.HttpTaskServer;
-
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.Objects;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson;
     private String requestBody;
 
     public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = HttpTaskServer.getGson();
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
-        String path = exchange.getRequestURI().getPath();
-        requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Endpoint endpoint = Endpoint.endpointFromMethodAndPath(method, path);
+        try {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+            requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            Endpoint endpoint = Endpoint.endpointFromMethodAndPath(method, path);
 
-        switch (endpoint) {
-            case GET_TASKS:
-                List<Task> tasks = taskManager.getAllTasks();
-                if (tasks.isEmpty()) {
-                    sendIfEmptyList(exchange);
+            switch (method) {
+
+                case "GET":
+                    handleGet(exchange, endpoint, path);
                     return;
-                }
-                sendText(exchange, gson.toJson(tasks), 200);
-                break;
 
-            case GET_TASK_BY_ID:
-                try {
-                    int idForGet = extractIdFromPath(path);
-                    Task task = taskManager.getTaskById(idForGet);
-                    if (task == null) {
-                        sendNotFound(exchange);
-                        return;
-                    }
-                    sendText(exchange, gson.toJson(task), 200);
-                } catch (NotFoundException e) {
-                    sendText(exchange, e.getMessage(), 404);
+                case "POST":
+                    handlePost(exchange, endpoint);
+                    return;
 
-                } catch (IllegalArgumentException e) {
-                    sendText(exchange, "Ошибка: неверный путь или идентификатор", 400);
-                }
-                break;
+                case "DELETE":
+                    handleDelete(exchange, endpoint, path);
+                    return;
 
-            case CREATE_OR_UPDATE_TASK:
-                createOrUpdateTask(exchange);
-                break;
+                default:
+                    new BaseHttpHandler.UnknownPathHandler().handle(exchange);
+            }
 
-            case DELETE_TASK:
-                try {
-                    int idForDelete = extractIdFromPath(path);
-                    if (taskManager.getTaskById(idForDelete) == null) {
-                        sendNotFound(exchange);
-                        return;
-                    }
-                    taskManager.deleteTaskById(idForDelete);
-                    sendText(exchange, "Задача с Id: " + idForDelete + " успешно удалена", 204);
+        } catch (NotFoundException e) {
+            sendText(exchange, e.getMessage(), 404);
 
-                } catch (NotFoundException e) {
-                    sendText(exchange, e.getMessage(), 404);
-                }
+        } catch (IllegalArgumentException e) {
+            sendText(exchange, "Ошибка: неверный путь или идентификатор", 400);
 
-            default:
-                new HttpTaskServer.UnknownPathHandler().handle(exchange);
+        } catch (Exception e) {
+            sendText(exchange, "Ошибка сервера: " + e.getMessage(), 500);
         }
     }
+
 
     private void createOrUpdateTask(HttpExchange exchange) throws IOException {
         try {
@@ -92,41 +68,19 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
             Long id = incoming.getId();
 
-            // --- Создание новой задачи ---
-            if (id == null || id == 0 || id == -1) {
-                Task newTask = new Task(
-                        incoming.getId(),
-                        incoming.getName(),
-                        incoming.getStatus(),
-                        incoming.getDescription(),
-                        incoming.getDuration(),
-                        incoming.getStartTime()
-                );
-
-                taskManager.putNewTask(newTask);
+            // === Создание новой задачи ===
+            if (id == null || id <= 0) {
+                Task newTask = taskManager.putNewTask(incoming);
                 sendText(exchange, "Задача создана с Id: " + newTask.getId(), 201);
                 return;
             }
 
-            // --- Обновление существующей задачи ---
-            Task existing = taskManager.getTaskById(id);
-            if (existing == null) {
-                sendNotFound(exchange);
-                return;
-            }
+            // === Обновление задачи ===
+            Task updated = taskManager.updateTask(incoming);
+            sendText(exchange, "Задача с Id: " + updated.getId() + " успешно обновлена", 200);
 
-            // immutable-обновление
-            Task updated = new Task(
-                    incoming.getId(),
-                    incoming.getName(),
-                    incoming.getStatus(),
-                    incoming.getDescription(),
-                    incoming.getDuration(),
-                    incoming.getStartTime()
-            );
-
-            taskManager.updateTask(updated);
-            sendText(exchange, "Задача с Id: " + id + " успешно обновлена", 200);
+        } catch (NotFoundException e) {
+            sendText(exchange, e.getMessage(), 404);
 
         } catch (ManagerSaveException e) {
             sendHasInteractions(exchange);
@@ -136,14 +90,57 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
+    private void handleGet(HttpExchange exchange, Endpoint endpoint, String path) throws IOException {
+        switch (endpoint) {
 
-    private int extractIdFromPath(String path) {
-        String[] pathParts = path.split("/");
+            case GET_TASKS: {
+                sendText(exchange, gson.toJson(taskManager.getAllTasks()), 200);
+                return;
+            }
 
-        if (pathParts.length >= 3 && "tasks".equals(pathParts[1])) {
-            return Integer.parseInt(pathParts[2]);
+            case GET_TASK_BY_ID: {
+                int id = extractIdFromPath(path);
+                Task task = taskManager.getTaskById(id);
+
+                if (task == null) {
+                    sendNotFound(exchange);
+                    return;
+                }
+
+                sendText(exchange, gson.toJson(task), 200);
+                return;
+            }
+
+            default:
+                new BaseHttpHandler.UnknownPathHandler().handle(exchange);
         }
-
-        throw new IllegalArgumentException("Неверный путь, идентификатор не найден");
     }
+
+    private void handlePost(HttpExchange exchange, Endpoint endpoint) throws IOException {
+        if (Objects.requireNonNull(endpoint) == Endpoint.CREATE_OR_UPDATE_TASK) {
+            createOrUpdateTask(exchange);
+            return;
+        } else {
+            new UnknownPathHandler().handle(exchange);
+        }
+    }
+
+    private void handleDelete(HttpExchange exchange, Endpoint endpoint, String path) throws IOException {
+        if (Objects.requireNonNull(endpoint) == Endpoint.DELETE_TASK) {
+            int id = extractIdFromPath(path);
+
+            if (taskManager.getTaskById(id) == null) {
+                sendNotFound(exchange);
+                return;
+            }
+            taskManager.deleteTaskById(id);
+            sendText(exchange, "Задача с Id: " + id + " успешно удалена", 204);
+
+        } else {
+            new UnknownPathHandler().handle(exchange);
+        }
+    }
+
+
+
 }
