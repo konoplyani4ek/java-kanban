@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public abstract class BaseHttpHandler {
-    protected final Gson gson = BaseHttpHandler.getGson();
+    protected final Gson gson = getGson();
 
     protected void sendText(HttpExchange exchange, String text, int statusCode) throws IOException {
         byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
@@ -37,7 +37,7 @@ public abstract class BaseHttpHandler {
         return Integer.parseInt(pathParts[2]);
     }
 
-    public static Gson getGson() {
+      static Gson getGson() {
         return new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())

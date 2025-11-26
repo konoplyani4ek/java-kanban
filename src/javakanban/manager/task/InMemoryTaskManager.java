@@ -74,9 +74,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     public Subtask getSubtaskById(long id) {
         Subtask subtask = subtaskHashMap.get(id);
-        if (subtask != null) {
-            historyManager.add(subtask);
+        if (subtask == null) {
+            throw new NotFoundException("Сабтаск с id " + id + " не найден");
         }
+        historyManager.add(subtask);
         return subtask;
     }
 
@@ -206,7 +207,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Subtask> getSubtasksByEpic(Epic epic) {
+    public List<Subtask> getSubtasksByEpicId(long epicId) {
+        Epic epic = epicHashMap.get(epicId);
+        if (epic == null) {
+            throw new NotFoundException("Эпик с id " + epicId + " не найден");
+        }
         return epic.getSubtasksId().stream()
                 .map(subtaskHashMap::get)
                 .filter(Objects::nonNull)
@@ -217,7 +222,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             throw new NullPointerException("Epic is null");
         }
-        List<Subtask> subtasks = getSubtasksByEpic(epic);
+        List<Subtask> subtasks = getSubtasksByEpicId(epic.getId());
 
         if (epic.getSubtasksId() == null || epic.getSubtasksId().isEmpty()) {
 

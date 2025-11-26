@@ -1,6 +1,7 @@
 package serverTest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javakanban.entity.Task;
 import javakanban.manager.task.InMemoryTaskManager;
 import javakanban.manager.task.TaskManager;
@@ -8,7 +9,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.HttpTaskServer;
-import server.handler.BaseHttpHandler;
+import server.adapter.Adapters;
+
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,14 +28,17 @@ public class PrioritizedHandlerTest {
 
     private TaskManager taskManager;
     private HttpTaskServer taskServer;
-    private Gson gson;
+    Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
+            .create();
     private HttpClient client;
 
     @BeforeEach
     public void setUp() throws IOException {
         taskManager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = BaseHttpHandler.getGson();
         client = HttpClient.newHttpClient();
         taskServer.start();
     }
@@ -43,7 +48,7 @@ public class PrioritizedHandlerTest {
         taskServer.stop();
     }
 
-    @Test // не работает
+    @Test
     public void testGetPrioritizedTasks() throws IOException, InterruptedException {
         Task task1 = new Task("Задача 1", "Описание 1");
         Task task2 = new Task("Задача 2", "Описание 2");

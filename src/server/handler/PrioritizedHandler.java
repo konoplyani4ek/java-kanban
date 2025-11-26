@@ -15,16 +15,9 @@ import java.util.List;
 
 public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson;
 
     public PrioritizedHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
-        this.gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .excludeFieldsWithoutExposeAnnotation()
-                .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
-                .create();
     }
 
     @Override
@@ -41,7 +34,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
             List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
 
             if (prioritizedTasks.isEmpty()) {
-                // Пустой список → 204 No Content, без тела
+                // Пустой список → 204 No Content без тела
                 exchange.sendResponseHeaders(204, -1);
             } else {
                 // Есть задачи → 200 OK + JSON

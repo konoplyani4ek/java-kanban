@@ -2,6 +2,7 @@ package serverTest;
 
 import com.google.gson.Gson;
 
+import com.google.gson.GsonBuilder;
 import javakanban.entity.Status;
 import javakanban.entity.Task;
 import javakanban.exception.NotFoundException;
@@ -11,8 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.HttpTaskServer;
-import server.handler.BaseHttpHandler;
-
+import server.adapter.Adapters;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,14 +29,18 @@ public class TaskHandlerTest {
 
     private TaskManager taskManager;
     private HttpTaskServer taskServer;
-    private Gson gson;
     private HttpClient client;
+    Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
+            .create();
+
 
     @BeforeEach
     public void setUp() throws IOException {
         taskManager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = BaseHttpHandler.getGson();
         client = HttpClient.newHttpClient();
         taskServer.start();
     }

@@ -1,6 +1,7 @@
 package serverTest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javakanban.entity.Epic;
 import javakanban.manager.task.InMemoryTaskManager;
 import javakanban.manager.task.TaskManager;
@@ -8,13 +9,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.HttpTaskServer;
-import server.handler.BaseHttpHandler;
+import server.adapter.Adapters;
+
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,14 +27,19 @@ public class EpicHandlerTest {
 
     private TaskManager taskManager;
     private HttpTaskServer taskServer;
-    private Gson gson;
+//    private Gson gson;
     private HttpClient client;
+    Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
+            .create();
+
 
     @BeforeEach
     public void setUp() throws IOException {
         taskManager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = BaseHttpHandler.getGson();
         client = HttpClient.newHttpClient();
         taskServer.start();
     }
@@ -66,16 +75,23 @@ public class EpicHandlerTest {
 
     @Test
     public void testAddEpic() throws IOException, InterruptedException {
+        // Создаём локальный Gson для теста
+
         Epic epic = new Epic("Тестовый эпик", "Описание эпика");
+
+        // Преобразуем объект в JSON
         String epicJson = gson.toJson(epic);
 
+        // Отправляем POST-запрос
         HttpResponse<String> response = sendPostRequest("http://localhost:8080/epics", epicJson);
         assertEquals(201, response.statusCode(), "Неверный код ответа при добавлении эпика.");
 
+        // Проверяем состояние менеджера
         List<Epic> epics = taskManager.getAllEpics();
         assertEquals(1, epics.size());
         assertEquals("Тестовый эпик", epics.get(0).getName());
     }
+
 
     @Test
     public void testGetAllEpics() throws IOException, InterruptedException {

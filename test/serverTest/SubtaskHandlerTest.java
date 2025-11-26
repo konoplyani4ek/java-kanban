@@ -2,16 +2,18 @@ package serverTest;
 
 import com.google.gson.Gson;
 
+import com.google.gson.GsonBuilder;
 import javakanban.entity.Epic;
 import javakanban.entity.Status;
 import javakanban.entity.Subtask;
+import javakanban.exception.NotFoundException;
 import javakanban.manager.task.InMemoryTaskManager;
 import javakanban.manager.task.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.HttpTaskServer;
-import server.handler.BaseHttpHandler;
+import server.adapter.Adapters;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,14 +30,18 @@ public class SubtaskHandlerTest {
 
     private TaskManager taskManager;
     private HttpTaskServer taskServer;
-    private Gson gson;
+    Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
+            .create();
+
     private HttpClient client;
 
     @BeforeEach
     public void setUp() throws IOException {
         taskManager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = BaseHttpHandler.getGson();
         client = HttpClient.newHttpClient();
         taskServer.start();
     }
@@ -135,8 +141,9 @@ public class SubtaskHandlerTest {
         HttpResponse<String> response = sendDeleteRequest("http://localhost:8080/subtasks/" + subtask.getId());
         assertEquals(204, response.statusCode(), "Неверный код ответа при удалении подзадачи.");
 
-        Subtask subtask2 = taskManager.getSubtaskById(subtask.getId());
-        assertNull(subtask2, "Подзадача должна быть null после удаления.");
+        assertThrows(NotFoundException.class,
+                () -> taskManager.getSubtaskById(subtask.getId()),
+                "Ожидается исключение NotFoundException после удаления");
     }
 
     @Test // не проходит

@@ -43,10 +43,7 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-    // ---------------------- GET ---------------------------
-
     private void handleGet(HttpExchange exchange, String path) throws IOException {
-        try {
             if (path.equals("/epics")) {
                 sendText(exchange, gson.toJson(taskManager.getAllEpics()), 200);
                 return;
@@ -62,29 +59,20 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
             if (path.matches("/epics/\\d+/subtasks")) {
                 int id = extractIdFromPath(path.split("/subtasks")[0]);
                 Epic epic = taskManager.getEpicById(id); // NotFoundException выбросит 404
-                sendText(exchange, gson.toJson(taskManager.getSubtasksByEpic(epic)), 200);
+                sendText(exchange, gson.toJson(taskManager.getSubtasksByEpicId(epic.getId())), 200);
                 return;
             }
-
             sendNotFound(exchange);
-        } catch (NotFoundException e) {
-            sendText(exchange, e.getMessage(), 404);
-        } catch (Exception e) {
-            sendText(exchange, "Ошибка сервера: " + e.getMessage(), 500);
-        }
     }
 
-
-
     private void handlePost(HttpExchange exchange, String path) throws IOException {
+        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
 
-        if (!path.equals("/epics")) {
-            sendNotFound(exchange);
+        if (path.equals("/epics")) {
+            createOrUpdateEpic(exchange, body);
             return;
         }
-
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        createOrUpdateEpic(exchange, body);
+        sendNotFound(exchange);
     }
 
     private void createOrUpdateEpic(HttpExchange exchange, String body) throws IOException {
@@ -114,24 +102,13 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleDelete(HttpExchange exchange, String path) throws IOException {
-        try {
-            if (!path.matches("/epics/\\d+")) {
-                sendNotFound(exchange);
-                return;
-            }
-
+        if (path.matches("/epics/\\d+")) {
             int id = extractIdFromPath(path);
-
             taskManager.deleteEpicById(id);
             sendText(exchange, "Эпик с Id: " + id + " успешно удален", 204);
-
-        } catch (NotFoundException e) {
-            sendText(exchange, e.getMessage(), 404);
-
-        } catch (Exception e) {
-            sendText(exchange, "Ошибка сервера: " + e.getMessage(), 500);
+            return;
         }
+        sendNotFound(exchange);
     }
-
 
 }
