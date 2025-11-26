@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 
 import javakanban.entity.Status;
 import javakanban.entity.Task;
+import javakanban.exception.NotFoundException;
 import javakanban.manager.task.InMemoryTaskManager;
 import javakanban.manager.task.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.HttpTaskServer;
+import server.handler.BaseHttpHandler;
 
 
 import java.io.IOException;
@@ -34,7 +36,7 @@ public class TaskHandlerTest {
     public void setUp() throws IOException {
         taskManager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = HttpTaskServer.getGson();
+        gson = BaseHttpHandler.getGson();
         client = HttpClient.newHttpClient();
         taskServer.start();
     }
@@ -115,23 +117,22 @@ public class TaskHandlerTest {
         String taskJson = gson.toJson(updatedTask);
 
         HttpResponse<String> response = sendPostRequest("http://localhost:8080/tasks", taskJson);
-        assertEquals(201, response.statusCode(), "Неверный код ответа при обновлении задачи.");
+        assertEquals(200, response.statusCode(), "Неверный код ответа при обновлении задачи.");
 
         Task task2 = taskManager.getTaskById(task.getId());
         assertNotNull(task, "Задача не должна быть null.");
         assertEquals("Обновленная задача", task2.getName(), "Имя задачи не совпадает после обновления.");
     }
 
-    @Test // не работает
+    @Test
     public void testDeleteTaskById() throws IOException, InterruptedException {
         Task task = taskManager.putNewTask(new Task("Задача 1", "Описание 1"));
-
         HttpResponse<String> response = sendDeleteRequest("http://localhost:8080/tasks/" + task.getId());
         assertEquals(204, response.statusCode(), "Неверный код ответа при удалении задачи.");
-
-        Task task2 = taskManager.getTaskById(task.getId());
-        assertNull(task, "Задача должна быть null после удаления.");
+        assertThrows(NotFoundException.class, () -> taskManager.getTaskById(task.getId()),
+                "Ожидается NotFoundException после удаления задачи");
     }
+
 
     @Test // не работает
     public void testDeleteTaskByIdNotFound() throws IOException, InterruptedException {

@@ -1,16 +1,11 @@
 package server;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
 import javakanban.manager.task.TaskManager;
-import server.adapter.Adapters;
 import server.handler.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
@@ -30,9 +25,6 @@ public class HttpTaskServer {
         httpServer.createContext("/epics", new EpicHandler(taskManager));
         httpServer.createContext("/history", new HistoryHandler(taskManager));
         httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager));
-
-        httpServer.createContext("/", new BaseHttpHandler.UnknownPathHandler());
-
         httpServer.start();
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
     }
@@ -41,11 +33,5 @@ public class HttpTaskServer {
         httpServer.stop(1);
     }
 
-    public static Gson getGson() {
-        return new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
-                .create();
-    }
+
 }

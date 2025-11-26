@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.HttpTaskServer;
+import server.handler.BaseHttpHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,7 +33,7 @@ public class PrioritizedHandlerTest {
     public void setUp() throws IOException {
         taskManager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = HttpTaskServer.getGson();
+        gson = BaseHttpHandler.getGson();
         client = HttpClient.newHttpClient();
         taskServer.start();
     }
@@ -46,8 +47,12 @@ public class PrioritizedHandlerTest {
     public void testGetPrioritizedTasks() throws IOException, InterruptedException {
         Task task1 = new Task("Задача 1", "Описание 1");
         Task task2 = new Task("Задача 2", "Описание 2");
+
+        task1.setStartTime(LocalDateTime.now().plusMinutes(10));
+        task2.setStartTime(LocalDateTime.now().plusMinutes(20));
         taskManager.putNewTask(task1);
         taskManager.putNewTask(task2);
+
 
         HttpResponse<String> response = client.send(
                 HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/prioritized"))

@@ -63,23 +63,30 @@ public class InMemoryTaskManager implements TaskManager {
         epicHashMap.clear();
     }
 
-    @Override
     public Task getTaskById(long id) {
-        Task task = taskHashMap.get(id);// чтобы два раза не читать map.get(id), создается объект
+        Task task = taskHashMap.get(id);
+        if (task == null) {
+            throw new NotFoundException("Задача с id " + id + " не найдена");
+        }
         historyManager.add(task);
         return task;
     }
 
-    @Override
     public Subtask getSubtaskById(long id) {
         Subtask subtask = subtaskHashMap.get(id);
-        historyManager.add(subtask);
+        if (subtask != null) {
+            historyManager.add(subtask);
+        }
         return subtask;
     }
+
 
     @Override
     public Epic getEpicById(long id) {
         Epic epic = epicHashMap.get(id);
+        if (epic == null) {
+            throw new NotFoundException("Эпик с id " + id + " не найден");
+        }
         historyManager.add(epic);
         return epic;
     }
@@ -124,22 +131,12 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Task with id " + id + " not found.");
         }
 
-        Task updated = new Task(
-                existing.getId(),
-                incoming.getName(),
-                incoming.getStatus(),
-                incoming.getDescription(),
-                incoming.getDuration(),
-                incoming.getStartTime()
-        );
-
-        checkIfIntersects(updated);
-
+        checkIfIntersects(incoming);
         removeFromPrioritized(existing);
-        taskHashMap.put(id, updated);
-        addToPrioritized(updated);
+        taskHashMap.put(id, incoming);
+        addToPrioritized(incoming);
 
-        return updated;
+        return incoming;
     }
 
     @Override
@@ -148,28 +145,16 @@ public class InMemoryTaskManager implements TaskManager {
 
         Subtask existing = subtaskHashMap.get(id);
         if (existing == null) {
-            throw new IllegalArgumentException("Subtask with id " + id + " not found.");
+            throw new NotFoundException("Subtask with id " + id + " not found.");
         }
-
-        Subtask updated = new Subtask(
-                existing.getId(),
-                incoming.getName(),
-                incoming.getStatus(),
-                incoming.getDescription(),
-                incoming.getDuration(),
-                incoming.getStartTime(),
-                existing.getEpicId()
-        );
-
-        checkIfIntersects(updated);
-
+        incoming.setEpicId(existing.getEpicId());
+        checkIfIntersects(incoming);
         removeFromPrioritized(existing);
-        subtaskHashMap.put(id, updated);
-
+        subtaskHashMap.put(id, incoming);
         Epic epic = getEpicById(existing.getEpicId());
         updateEpicFields(epic);
 
-        return updated;
+        return incoming;
     }
 
 
@@ -180,18 +165,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (id == null || !epicHashMap.containsKey(id)) {
             throw new NotFoundException("Epic with id " + id + " not found.");
         }
-        Epic existing = epicHashMap.get(id);
-        Epic updated = new Epic(
-                existing.getId(),
-                incoming.getName(),
-                existing.getStatus(),
-                incoming.getDescription(),
-                existing.getDuration(),
-                existing.getStartTime(),
-                existing.getEndTime()
-        );
-        epicHashMap.put(id, updated);
-        return updated;
+        epicHashMap.put(id, incoming);
+        return incoming;
     }
 
     @Override

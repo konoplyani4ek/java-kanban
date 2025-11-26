@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class Subtask extends Task {
 
-    private final Long epicId;
+     private Long epicId;
 
     //конструктор с новыми полями не нужен
     public Subtask(String name, String description, Long epicId) {
@@ -20,6 +20,10 @@ public class Subtask extends Task {
 
     public Long getEpicId() {
         return epicId;
+    }
+
+    public void setEpicId(Long epicId){
+        this.epicId = epicId;
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.HttpTaskServer;
+import server.handler.BaseHttpHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -34,7 +35,7 @@ public class SubtaskHandlerTest {
     public void setUp() throws IOException {
         taskManager = new InMemoryTaskManager();
         taskServer = new HttpTaskServer(taskManager);
-        gson = HttpTaskServer.getGson();
+        gson = BaseHttpHandler.getGson();
         client = HttpClient.newHttpClient();
         taskServer.start();
     }
@@ -121,11 +122,12 @@ public class SubtaskHandlerTest {
         assertEquals(201, response.statusCode(), "Неверный код ответа при обновлении подзадачи.");
 
         Subtask subtask2 = taskManager.getSubtaskById(subtask.getId());
-        assertNotNull(subtask, "Подзадача не должна быть null.");
-        assertEquals("Обновленная подзадача", subtask.getName(), "Имя подзадачи не совпадает после обновления.");
+        assertNotNull(subtask2, "Подзадача не должна быть null.");
+        assertEquals("Обновленная подзадача", subtask2.getName(), "Имя подзадачи не совпадает после обновления.");
+
     }
 
-    @Test // exp 201, actual 200
+    @Test
     public void testDeleteSubtaskById() throws IOException, InterruptedException {
         Epic epic = taskManager.putNewEpic(new Epic("Эпик 1", "Описание 1"));
         Subtask subtask = taskManager.putNewSubtask(new Subtask("Подзадача 1", "Описание 1", epic.getId()));
@@ -134,7 +136,7 @@ public class SubtaskHandlerTest {
         assertEquals(204, response.statusCode(), "Неверный код ответа при удалении подзадачи.");
 
         Subtask subtask2 = taskManager.getSubtaskById(subtask.getId());
-        assertNull(subtask, "Подзадача должна быть null после удаления.");
+        assertNull(subtask2, "Подзадача должна быть null после удаления.");
     }
 
     @Test // не проходит
