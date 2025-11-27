@@ -70,42 +70,39 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handlePost(HttpExchange exchange, String path) throws IOException {
         // POST /subtasks
-        if (!path.equals("/subtasks")) {
-            sendNotFound(exchange);
-            return;
-        }
+        if ("/subtasks".equals(path)) {
 
-        String requestBody = readBody(exchange);
-        Subtask incoming = gson.fromJson(requestBody, Subtask.class);
+            String requestBody = readBody(exchange);
+            Subtask incoming = gson.fromJson(requestBody, Subtask.class);
 
-        if (incoming == null) {
-            sendText(exchange, "Ошибка: некорректное тело запроса", 400);
-            return;
-        }
-
-        Long epicId = incoming.getEpicId();
-        Epic epic = taskManager.getEpicById(epicId);
-
-        if (epic == null) {
-            sendText(exchange, "Ошибка: такого эпика не существует", 400);
-            return;
-        }
-
-        try {
-            // === Создание ===
-            if (incoming.getId() == null || incoming.getId() <= 0) {
-                Subtask created = taskManager.putNewSubtask(incoming);
-                sendText(exchange, "Создано. Id: " + created.getId(), 201);
+            if (incoming == null) {
+                sendText(exchange, "Ошибка: некорректное тело запроса", 400);
                 return;
             }
 
-            // === Обновление ===
-            Subtask updated = taskManager.updateSubtask(incoming);
-            sendText(exchange, "Обновлено. Id: " + updated.getId(), 201);
+            Long epicId = incoming.getEpicId();
+            Epic epic = taskManager.getEpicById(epicId);
 
-        } catch (ManagerSaveException e) {
-            sendHasInteractions(exchange);
+            if (epic == null) {
+                sendText(exchange, "Ошибка: такого эпика не существует", 400);
+                return;
+            }
+
+            try {
+                if (incoming.getId() == null || incoming.getId() <= 0) {
+                    Subtask created = taskManager.putNewSubtask(incoming);
+                    sendText(exchange, "Создано. Id: " + created.getId(), 201);
+                    return;
+                }
+                Subtask updated = taskManager.updateSubtask(incoming);
+                sendText(exchange, "Обновлено. Id: " + updated.getId(), 201);
+
+            } catch (ManagerSaveException e) {
+                sendHasInteractions(exchange);
+            }
+            return;
         }
+        sendNotFound(exchange);
     }
 
     private void handleDelete(HttpExchange exchange, String path) throws IOException {

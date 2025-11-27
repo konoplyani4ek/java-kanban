@@ -83,7 +83,7 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
                 throw new NotFoundException("Тело запроса пустое или некорректное");
             }
             // Создание
-            if (incoming.getId() == null || incoming.getId() <= 0) {
+            if (incoming.getId() == null) {
                 Epic newEpic = taskManager.putNewEpic(incoming);
                 sendText(exchange, "Эпик создан с Id: " + newEpic.getId(), 201);
                 return;

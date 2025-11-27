@@ -67,14 +67,14 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handlePost(HttpExchange exchange, String path) throws IOException {
-
-        if (!path.equals("/tasks")) {
-            sendNotFound(exchange);
+        if ("/tasks".equals(path)) {
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            createOrUpdateTask(exchange, body);
             return;
         }
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        createOrUpdateTask(exchange, body);
+        sendNotFound(exchange);
     }
+
 
     private void createOrUpdateTask(HttpExchange exchange, String body) throws IOException {
         try {
