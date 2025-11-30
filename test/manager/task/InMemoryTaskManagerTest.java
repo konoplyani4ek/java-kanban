@@ -204,8 +204,11 @@ public class InMemoryTaskManagerTest {
 
     @Test
     void getHistory_returnHistory_withTasks() {
-        Task task1 = taskManager.putNewTask(buildTask());
-        Task task2 = taskManager.putNewTask(buildTask());
+        Task task1 = buildTask();
+        taskManager.putNewTask(task1);
+        Task task2 = buildTask();
+        task2.setStartTime(LocalDateTime.now().plusHours(2));
+        taskManager.putNewTask(task2);
         taskManager.getTaskById(1);
         taskManager.getTaskById(2);
         assertEquals(task1, taskManager.getHistory().get(0));
@@ -227,45 +230,60 @@ public class InMemoryTaskManagerTest {
     void getHistory_returnHistory_withSubtasks() {
         Epic epic1 = taskManager.putNewEpic(buildEpic());
         Epic epic2 = taskManager.putNewEpic(buildEpic());
+
         Subtask subtask1 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic1));
-        Subtask subtask2 = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic2));
-        taskManager.getSubtaskById(3);
-        taskManager.getSubtaskById(4);
+        Subtask subtask2 = buildSubtaskWithTemporalParams(epic2);
+        subtask2.setStartTime(subtask1.getStartTime().plusHours(2));
+        taskManager.putNewSubtask(subtask2);
+
+        taskManager.getSubtaskById(subtask1.getId());
+        taskManager.getSubtaskById(subtask2.getId());
+
         assertEquals(subtask1, taskManager.getHistory().get(0));
         assertEquals(subtask2, taskManager.getHistory().get(1));
     }
+
 
     @Test
     void getHistory_addToHistory_whenGetById() {
         Task task = taskManager.putNewTask(buildTask());
         assertEquals(1, task.getId());
-        taskManager.getTaskById(1);
+        taskManager.getTaskById(task.getId());
         Epic epic = taskManager.putNewEpic(buildEpic());
         assertEquals(2, epic.getId());
-        taskManager.getEpicById(2);
-        Subtask subtask = taskManager.putNewSubtask(buildSubtaskWithTemporalParams(epic));
+        taskManager.getEpicById(epic.getId());
+        Subtask subtask = buildSubtaskWithTemporalParams(epic);
+        subtask.setStartTime(task.getStartTime().plusHours(2));
+        taskManager.putNewSubtask(subtask);
         assertEquals(3, subtask.getId());
-        taskManager.getSubtaskById(3);
+        taskManager.getSubtaskById(subtask.getId());
         assertTrue(taskManager.getHistory().contains(task));
         assertTrue(taskManager.getHistory().contains(epic));
         assertTrue(taskManager.getHistory().contains(subtask));
     }
 
+
     @Test
-        //новый тест
     void getHistory_addToHistory_whenGetSameTask() {
         Task task1 = taskManager.putNewTask(buildTask());
-        Task task2 = taskManager.putNewTask(buildTask());
-        Task task3 = taskManager.putNewTask(buildTask());
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(2);
-        taskManager.getTaskById(3);
-        taskManager.getTaskById(1);
+        Task task2 = buildTask();
+        task2.setStartTime(task1.getStartTime().plusHours(2));
+        task2 = taskManager.putNewTask(task2);
+        Task task3 = buildTask();
+        task3.setStartTime(task2.getStartTime().plusHours(2));
+        task3 = taskManager.putNewTask(task3);
+
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getTaskById(task3.getId());
+        taskManager.getTaskById(task1.getId());
+
         assertEquals(3, taskManager.getHistory().size());
         assertEquals(task2, taskManager.getHistory().get(0));
         assertEquals(task3, taskManager.getHistory().get(1));
         assertEquals(task1, taskManager.getHistory().get(2));
     }
+
 
     @Test
     void putNewSubtask_notAddSubtask_withIdOfEpic() { // проверьте, что объект Epic нельзя добавить в самого себя в виде подзадачи;
@@ -301,12 +319,16 @@ public class InMemoryTaskManagerTest {
 
     @Test
     void epicStatus_shouldBeCalculatedBasedOnSubtasks() {
-        // создаём эпик
         Epic epic = buildEpic();
         taskManager.putNewEpic(epic);
 
         Subtask subtask1 = buildSubtaskWithTemporalParams(epic);
+        subtask1.setStartTime(LocalDateTime.now());
+        subtask1.setDuration(Duration.ofHours(1));
+
         Subtask subtask2 = buildSubtaskWithTemporalParams(epic);
+        subtask2.setStartTime(subtask1.getStartTime().plusHours(2));
+        subtask2.setDuration(Duration.ofHours(1));
 
         taskManager.putNewSubtask(subtask1);
         taskManager.putNewSubtask(subtask2);
@@ -328,6 +350,8 @@ public class InMemoryTaskManagerTest {
         updatedEpic = taskManager.getEpicById(epic.getId());
         assertEquals(Status.DONE, updatedEpic.getStatus());
     }
+
+
 
     @Test
     void tasksShouldNotOverlapInTime_usingBuildTask() {
