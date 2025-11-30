@@ -37,7 +37,7 @@ public abstract class BaseHttpHandler {
         return Integer.parseInt(pathParts[2]);
     }
 
-      static Gson getGson() {
+     protected static Gson getGson() {
         return new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
